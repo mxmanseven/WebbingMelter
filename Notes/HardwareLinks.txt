@@ -1,0 +1,3 @@
+
+Button Schmitt-Trigger:
+    http://www.ti.com/lit/ds/symlink/sn74hc14.pdf
