@@ -3,6 +3,8 @@
 #include <Wire.h>
 #include <LiquidCrystal.h>
 
+#include "Display.h"
+
 enum TopLevelMode 
 {
   SetUp,
@@ -16,7 +18,7 @@ enum ProductionMode
 };
 
 TopLevelMode topLevelMode;
-ProductionMode productionMode; 
+ProductionMode productionMode;
 
 // nav button pins:
 uint8_t btnLeftPin = PB10;
@@ -33,25 +35,24 @@ uint8_t lcdD2 = PA1;
 uint8_t lcdD3 = PA0;
 
 LiquidCrystal lcd(lcdRs, lcdEnable, lcdD0, lcdD1, lcdD2, lcdD3);
+Display display;
 
-bool btnLeftIsDown = false;
-bool btnRightIsDown = false;
-bool btnUpIsDown = false;
-bool btnDownIsDown = false;
+ButtonDirection buttonDirection;
 
 void butLeftDown() {
-  btnLeftIsDown = true;
+  buttonDirection = ButtonDirection::Left;
 }
 
 void butRightDown() {
-  btnRightIsDown = true;
+  buttonDirection = ButtonDirection::Down;
 }
 
 void butUpDown() {
-  btnUpIsDown = true;
+  buttonDirection = ButtonDirection::Up;
 }
+
 void butDownDown() {
-  btnDownIsDown = true;
+  buttonDirection = ButtonDirection::Down;
 }
 
 void initSerial() {
@@ -74,30 +75,24 @@ void initButtons() {
   attachInterrupt(btnDownPin, butDownDown, RISING);
 }
 
-void buttonsClear() {
-  btnLeftIsDown = false;
-  btnRightIsDown = false;
-  btnUpIsDown = false;
-  btnDownIsDown = false;
-}
-
 // the setup function runs once when you press reset or power the board
 void setup() {
   topLevelMode = TopLevelMode::SetUp;
   initSerial();
   initButtons();
   lcd.begin(20,4);
+  
+  display.InitDisplay(lcd);
+  delay(1000);
 }
 
-int i = 0;
 void loop() 
 {
-
   switch (topLevelMode) 
   {
     case TopLevelMode::SetUp:
     {
-
+      display.UpdateDisplay(lcd, buttonDirection);
     }
     case TopLevelMode::Production:
     {
@@ -105,50 +100,8 @@ void loop()
     }
   }
 
-  buttonsClear();
-
-  Serial.println("hi" + String(i++));
-  delay(1000);
-
-  lcd.clear();
-
-  char buff[22];
-
-  lcd.setCursor(0,0);
-  //String(i).toCharArray(buff, 10, 0);
-  snprintf(buff, 22, "Run Kount %10d", i);
-  lcd.print(buff);
-
-  lcd.setCursor(0,1);
-  lcd.print("Two");
-
-  lcd.setCursor(0,2);
-  lcd.print("Three");
-
-  lcd.setCursor(0,3);
-  lcd.print("Four");
-
-  if(btnRightIsDown)
-  {
-    Serial.println("Btn Right Down");
-    btnRightIsDown = false;
-  }
-
-  if(btnLeftIsDown)
-  {
-    Serial.println("Btn Left is donw");
-    btnLeftIsDown = false;
-  }
-  
-  if(btnUpIsDown)
-  {
-    Serial.println("Btn Up Down");
-    btnUpIsDown = false;
-  }
-
-  if(btnDownIsDown)
-  {
-    Serial.println("Btn Down is down");
-    btnDownIsDown = false;
+  if(buttonDirection != ButtonDirection::None) {
+    Serial.println("button dir: " + String(buttonDirection));
+    buttonDirection = ButtonDirection::None;
   }
 }
