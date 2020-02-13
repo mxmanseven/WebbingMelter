@@ -3,6 +3,21 @@
 #include <Wire.h>
 #include <LiquidCrystal.h>
 
+enum TopLevelMode 
+{
+  SetUp,
+  Production
+};
+
+enum ProductionMode
+{
+  ZeroOut,
+  Run
+};
+
+TopLevelMode topLevelMode;
+ProductionMode productionMode; 
+
 // nav button pins:
 uint8_t btnLeftPin = PB10;
 uint8_t btnRightPin = PA7;
@@ -24,27 +39,22 @@ bool btnRightIsDown = false;
 bool btnUpIsDown = false;
 bool btnDownIsDown = false;
 
-void butLeftDown()
-{
+void butLeftDown() {
   btnLeftIsDown = true;
 }
 
-void butRightDown()
-{
+void butRightDown() {
   btnRightIsDown = true;
 }
 
-void butUpDown()
-{
+void butUpDown() {
   btnUpIsDown = true;
 }
-void butDownDown()
-{
+void butDownDown() {
   btnDownIsDown = true;
 }
 
-void initSerial()
-{
+void initSerial() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
   while (!Serial) {
@@ -52,8 +62,7 @@ void initSerial()
   }
 }
 
-void initButtons()
-{
+void initButtons() {
   pinMode(btnLeftPin, INPUT_PULLDOWN);
   pinMode(btnRightPin, INPUT_PULLDOWN);
   pinMode(btnUpPin, INPUT_PULLDOWN);
@@ -65,17 +74,39 @@ void initButtons()
   attachInterrupt(btnDownPin, butDownDown, RISING);
 }
 
+void buttonsClear() {
+  btnLeftIsDown = false;
+  btnRightIsDown = false;
+  btnUpIsDown = false;
+  btnDownIsDown = false;
+}
+
 // the setup function runs once when you press reset or power the board
 void setup() {
-
+  topLevelMode = TopLevelMode::SetUp;
   initSerial();
   initButtons();
-  lcd.begin(20,4);               // initialize the lcd
+  lcd.begin(20,4);
 }
 
 int i = 0;
 void loop() 
 {
+
+  switch (topLevelMode) 
+  {
+    case TopLevelMode::SetUp:
+    {
+
+    }
+    case TopLevelMode::Production:
+    {
+      
+    }
+  }
+
+  buttonsClear();
+
   Serial.println("hi" + String(i++));
   delay(1000);
 
@@ -85,7 +116,7 @@ void loop()
 
   lcd.setCursor(0,0);
   //String(i).toCharArray(buff, 10, 0);
-  snprintf(buff, 22, "Run Count %10d", i);
+  snprintf(buff, 22, "Run Kount %10d", i);
   lcd.print(buff);
 
   lcd.setCursor(0,1);
