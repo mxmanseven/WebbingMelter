@@ -81,6 +81,7 @@ void setup() {
   initSerial();
   initButtons();
   lcd.begin(20,4);
+  lcd.cursor();
   
   display.InitDisplay(lcd);
   delay(1000);
