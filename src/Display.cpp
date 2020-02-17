@@ -11,8 +11,9 @@ Display::Display() {
     currentLabelIndex = 0;
 }
 
-void Display::InitDisplay(LiquidCrystal& lcd) {    
-    lcd.clear();
+void Display::UpdateDisplayAllRows(LiquidCrystal& lcd) {    
+    //lcd.clear();  -- removing the clear increases lcd responsivness
+    // make sure the whole screen is written to if clear is not used.
     Serial.println("Init display currentLableIndex:" + String(currentLabelIndex));
 
     for (int row = 0; row < Display::LCD_ROW_COUNT; row++){
@@ -60,6 +61,6 @@ void Display::UpdateDisplay(
     }
 
     if(buttonDirection != ButtonDirection::None) {
-        InitDisplay(lcd);
+        UpdateDisplayAllRows(lcd);
     }
 }

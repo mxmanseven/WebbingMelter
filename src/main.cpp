@@ -78,12 +78,13 @@ void initButtons() {
 // the setup function runs once when you press reset or power the board
 void setup() {
   topLevelMode = TopLevelMode::SetUp;
+  buttonDirection = ButtonDirection::None;
   initSerial();
   initButtons();
   lcd.begin(20,4);
   lcd.cursor();
   
-  display.InitDisplay(lcd);
+  display.UpdateDisplayAllRows(lcd);
   delay(1000);
 }
 

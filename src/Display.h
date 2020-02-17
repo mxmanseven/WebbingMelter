@@ -32,7 +32,7 @@ class Display
         int currentLabelIndex;
 
         Display();
-        void InitDisplay(LiquidCrystal& lcd);
+        void UpdateDisplayAllRows(LiquidCrystal& lcd);
         void UpdateDisplay(
             LiquidCrystal& lcd, 
             ButtonDirection ButtonDirection);
