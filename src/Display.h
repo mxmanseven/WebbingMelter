@@ -3,6 +3,7 @@
 
 #include <Wire.h>
 #include <LiquidCrystal.h>
+#include "EeWrapper.h"
 
 enum ButtonDirection {
     None,
@@ -27,9 +28,14 @@ class Display
 
         String rowLabels[LABEL_COUNT];
 
+        String rowValues[LABEL_COUNT];
+
         int currentColumnIndex;
         int currentRowIndex;
         int currentLabelIndex;
+
+        PersistantData data;
+        EeWrapper eeWrapper;
 
         Display();
         void UpdateDisplayAllRows(LiquidCrystal& lcd);

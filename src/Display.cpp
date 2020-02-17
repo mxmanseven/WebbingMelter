@@ -9,6 +9,14 @@ Display::Display() {
     currentColumnIndex = 0;
     currentRowIndex = 0;
     currentLabelIndex = 0;
+
+    data = eeWrapper.Get();
+
+    Display::rowValues[0] = "Go";
+    Display::rowValues[1] = String(data.runCount);
+    Display::rowValues[2] = String(data.meltSpeed);
+    Display::rowValues[3] = String(data.coolSpeed);
+    Display::rowValues[4] = String(data.cutLength);
 }
 
 void Display::UpdateDisplayAllRows(LiquidCrystal& lcd) {    
