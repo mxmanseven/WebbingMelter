@@ -12,13 +12,14 @@ struct PersistantData
 class EeWrapper
 {
     public:
-    PersistantData data;
+    //PersistantData data;
     const int EEPROM_INDEX = 0;
 
     EeWrapper();
 
-    PersistantData Get();
-    void Write();
+    void Get(PersistantData& data);
+    void Write(PersistantData& data);
+    void Test();
 };
 
 #endif

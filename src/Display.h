@@ -21,7 +21,7 @@ class Display
         static const int LABEL_COUNT = 5;
 
         const char* RUN_LABEL = "Run";
-        const char* RUN_COUNT_LABEL = "Run Count";
+        const char* RUN_COUNT_LABEL =  "Run Count";
         const char* MELT_SPEED_LABEL = "Melt Speed";
         const char* COOL_SPEED_LABEL = "Cool Speed";
         const char* CUT_LENGTH_LABEL = "Cut Length";

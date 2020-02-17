@@ -10,8 +10,7 @@ Display::Display() {
     currentRowIndex = 0;
     currentLabelIndex = 0;
 
-    data = eeWrapper.Get();
-
+     eeWrapper.Get(data);
     Display::rowValues[0] = "Go";
     Display::rowValues[1] = String(data.runCount);
     Display::rowValues[2] = String(data.meltSpeed);
@@ -31,7 +30,25 @@ void Display::UpdateDisplayAllRows(LiquidCrystal& lcd) {
         Serial.println(
             "Init display rowLabels[" 
             + String(labelIndex) + "]: " +  toPrint); 
-        lcd.print(Display::rowLabels[labelIndex]);    
+        
+
+
+        int lineBuffLength = 21;
+        char lineBuff[lineBuffLength];
+
+        String label = Display::rowLabels[labelIndex];
+        String value = Display::rowValues[labelIndex];
+
+        Serial.println(label);
+        Serial.println(value);
+
+        snprintf(lineBuff, lineBuffLength, "%-10s %9s",
+            Display::rowLabels[labelIndex].c_str(),
+            Display::rowValues[labelIndex].c_str());
+
+        Serial.println(lineBuff);
+
+        lcd.print(lineBuff);
     }
 }
 
