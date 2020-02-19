@@ -35,7 +35,7 @@ uint8_t lcdD2 = PA1;
 uint8_t lcdD3 = PA0;
 
 LiquidCrystal lcd(lcdRs, lcdEnable, lcdD0, lcdD1, lcdD2, lcdD3);
-Display display;
+SetupDisplay display;
 
 ButtonDirection buttonDirection;
 
@@ -84,7 +84,8 @@ void setup() {
   lcd.begin(20,4);
   lcd.cursor();
   
-  display.UpdateDisplayAllRows(lcd);
+  bool exitSetUpMode = false;
+  display.UpdateDisplayAllRows(lcd, exitSetUpMode);
   delay(1000);
 }
 
@@ -93,8 +94,13 @@ void loop()
   switch (topLevelMode) 
   {
     case TopLevelMode::SetUp:
-    {
-      display.UpdateDisplay(lcd, buttonDirection);
+    {      
+      bool exitSetUpMode = false;
+      display.UpdateDisplay(lcd, buttonDirection, exitSetUpMode);
+      if (exitSetUpMode) {
+        topLevelMode = TopLevelMode::Production;
+      }
+      break;
     }
     case TopLevelMode::Production:
     {

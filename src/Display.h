@@ -13,7 +13,9 @@ enum ButtonDirection {
     Down
 };
 
-class Display
+String FloatFormat(float f, uint8_t percision);
+
+class SetupDisplay
 {
     public:
         const int LCD_COLUMN_COUNT = 20;
@@ -30,6 +32,8 @@ class Display
 
         String rowValues[LABEL_COUNT];
 
+        int rowPrecision[LABEL_COUNT];
+
         int currentColumnIndex;
         int currentRowIndex;
         int currentLabelIndex;
@@ -37,11 +41,21 @@ class Display
         PersistantData data;
         EeWrapper eeWrapper;
 
-        Display();
-        void UpdateDisplayAllRows(LiquidCrystal& lcd);
+        SetupDisplay();
+
+        void UpdateDisplayAllRows(
+            LiquidCrystal& lcd,
+            bool& exitSetUpMode);
+
         void UpdateDisplay(
             LiquidCrystal& lcd, 
-            ButtonDirection ButtonDirection);
+            ButtonDirection ButtonDirection,
+            bool& exitSetUpMode);
+
+        void ChangeRowValue(
+            int rowIndex,
+            ButtonDirection direction,
+            bool& exitSetUpMode);
 };
 
 #endif
