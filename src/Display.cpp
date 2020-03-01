@@ -13,9 +13,14 @@ String FloatFormat(float f, uint8_t percision)
         int multiplier =  pow(10, percision);
         int fractionPartInt = fractionPart * multiplier;
 
+        String filler = ".";
+        if(fractionPartInt < multiplier / 10) { // need to add leading zeros
+            filler += "0";
+        }
+
         char buffFraction[10];
         snprintf(buffFraction, 10, "%d", fractionPartInt);
-        result += "." + String(buffFraction);
+        result += filler + String(buffFraction);
     }
 
     return result;
@@ -37,7 +42,6 @@ SetupDisplay::SetupDisplay() {
     SetupDisplay::rowLabels[3] = SetupDisplay::COOL_SPEED_LABEL;
     SetupDisplay::rowLabels[4] = SetupDisplay::CUT_LENGTH_LABEL;
     currentColumnIndex = 0;
-    currentRowIndex = 0;
     currentLabelIndex = 0;
 
     eeWrapper.Get(data);
@@ -52,7 +56,6 @@ void SetupDisplay::ZeroOut(LiquidCrystal& lcd)
 {
     lcd.clear();
     currentColumnIndex = 0;
-    currentRowIndex = 0;
     currentLabelIndex = 0;
 }
 
@@ -87,6 +90,10 @@ void SetupDisplay::UpdateDisplayAllRows(
         lcd.print(lineBuff);
     }
     
+    // set the cursor to the left when changing nav labels
+    // set the cursor to the right when changing values (+/-)
+    int column = currentColumnIndex == 0 ? 0 : 19;
+    lcd.setCursor(column, 0);
     char buff[10];
     snprintf(buff, 10, "%4.3f", data.cutLength);
     Serial.println("Display: " + String(buff));
@@ -101,28 +108,25 @@ void SetupDisplay::UpdateDisplay(
     {
         case ButtonDirection::Left:
         {
-            currentColumnIndex = 0;
+            currentColumnIndex = 0; // nav labels, up / down -> change menu option
             break;
         }
         case ButtonDirection::Right:
         {
-            currentColumnIndex = 1;
+            currentColumnIndex = 1;  // nav values, up / down -> change menu value
             break;            
         }
         case ButtonDirection::Up:
         {
-            if(currentColumnIndex == 0)
+            if(currentColumnIndex == 0) // change menu option
             {
-                currentLabelIndex = (--currentLabelIndex < 0) 
+                currentLabelIndex = (--currentLabelIndex < 0) // wrap around to last item if we go past first itme
                     ? LABEL_COUNT - 1
                     : --currentLabelIndex;
-                currentRowIndex = (--currentRowIndex < 0)
-                    ? LCD_ROW_COUNT - 1
-                    : --currentRowIndex;
             }
             else
             {
-                ChangeRowValue(currentRowIndex, buttonDirection, exitSetUpMode);
+                ChangeRowValue(currentLabelIndex, buttonDirection, exitSetUpMode);
             }
             
             break;
@@ -132,11 +136,10 @@ void SetupDisplay::UpdateDisplay(
             if(currentColumnIndex == 0)
             {
                 currentLabelIndex = abs(++currentLabelIndex % LABEL_COUNT);
-                currentRowIndex = abs(++currentRowIndex % LCD_ROW_COUNT);
             }
             else
             {
-                ChangeRowValue(currentRowIndex, buttonDirection, exitSetUpMode);
+                ChangeRowValue(currentLabelIndex, buttonDirection, exitSetUpMode);
             }
 
             break;
@@ -151,22 +154,27 @@ void SetupDisplay::UpdateDisplay(
 }
 
 void SetupDisplay::ChangeRowValue(
-            int rowIndex,
+            int labelIndex,
             ButtonDirection direction,
             bool& exitSetUpMode)
 {
-    if(rowIndex == 0) {
-        // this is the run go row, if button is right then enter production mode
+    if(labelIndex == 0) {
+        // this is the run go row, 
+        //  if button is right then enter production mode
         exitSetUpMode = true;        
     }
     else {
-        String rowValueStr = SetupDisplay::rowValues[rowIndex];
-        if (rowIndex >= 2 || rowIndex <= 4) {
+        String rowValueStr = SetupDisplay::rowValues[labelIndex];
+        if (labelIndex >= MELT_LABLE_INDEX || labelIndex <= CUT_LABLE_INDEX) {
             // row value is a float
             float rowValueF = rowValueStr.toFloat();
-            float changeAmount = 0.01;
+            float changeAmount = 0.01001;
             if(direction == ButtonDirection::Down) changeAmount = changeAmount * -1;
             rowValueF += changeAmount;
+            rowValueStr = FloatFormat(rowValueF, 2);
+            SetupDisplay::rowValues[labelIndex] = rowValueStr;
+
+            // knh todo - save new value to ee prom
         }
     }
 }

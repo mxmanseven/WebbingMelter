@@ -45,19 +45,27 @@ DisplayProd displayProd;
 ButtonDirection buttonDirection;
 
 void butLeftDown() {
+  noInterrupts();
   buttonDirection = ButtonDirection::Left;
+  interrupts();
 }
 
 void butRightDown() {
+  noInterrupts();
   buttonDirection = ButtonDirection::Right;
+  interrupts();
 }
 
 void butUpDown() {
+  noInterrupts();
   buttonDirection = ButtonDirection::Up;
+  interrupts();
 }
 
 void butDownDown() {
+  noInterrupts();
   buttonDirection = ButtonDirection::Down;
+  interrupts();
 }
 
 void initSerial() {
@@ -96,32 +104,33 @@ void setup() {
 
 void loop() 
 {
-  switch (topLevelMode) 
-  {
-    case TopLevelMode::SetUp:
-    {      
-      bool exitSetUpMode = false;
-      setupDisplay.UpdateDisplay(lcd, buttonDirection, exitSetUpMode);
-      if (exitSetUpMode) {
-        topLevelMode = TopLevelMode::Production;
-
-        setupDisplay.ZeroOut(lcd);
-
-        int runCount = setupDisplay.data.runCount;
-        displayProd.expectedRunCount = runCount;
-        displayProd.currentRunCount = 0;
-
-        displayProd.ShowCommandAndRunCount(lcd, "Prod Mode");
-      }
-      break;
-    }
-    case TopLevelMode::Production:
-    {
-      
-    }
-  }
-
   if(buttonDirection != ButtonDirection::None) {
+    switch (topLevelMode) 
+    {
+      case TopLevelMode::SetUp:
+      {      
+        bool exitSetUpMode = false;
+        setupDisplay.UpdateDisplay(lcd, buttonDirection, exitSetUpMode);
+        
+        if (exitSetUpMode) {
+          topLevelMode = TopLevelMode::Production;
+
+          setupDisplay.ZeroOut(lcd);
+
+          int runCount = setupDisplay.data.runCount;
+          displayProd.expectedRunCount = runCount;
+          displayProd.currentRunCount = 0;
+
+          displayProd.ShowCommandAndRunCount(lcd, "Prod Mode");
+        }
+        break;
+      }
+      case TopLevelMode::Production:
+      {
+        break;
+      }
+    }
+
     Serial.println("button dir: " + String(buttonDirection));
     buttonDirection = ButtonDirection::None;
   }

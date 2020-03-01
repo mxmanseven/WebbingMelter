@@ -28,6 +28,12 @@ class SetupDisplay
         const char* COOL_SPEED_LABEL = "Cool Speed";
         const char* CUT_LENGTH_LABEL = "Cut Length";
 
+        const int RUN_LABLE_INDEX = 0;
+        const int RUN_COUNT_LABLE_INDEX = 1;
+        const int MELT_LABLE_INDEX = 2;
+        const int COOL_LABLE_INDEX = 3;
+        const int CUT_LABLE_INDEX = 4;
+
         String rowLabels[LABEL_COUNT];
 
         String rowValues[LABEL_COUNT];
@@ -35,7 +41,7 @@ class SetupDisplay
         int rowPrecision[LABEL_COUNT];
 
         int currentColumnIndex;
-        int currentRowIndex;
+        //int currentRowIndex;
         int currentLabelIndex;
 
         PersistantData data;
