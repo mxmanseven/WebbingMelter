@@ -48,6 +48,14 @@ SetupDisplay::SetupDisplay() {
     SetupDisplay::rowValues[4] = FloatFormat(data.cutLength, 3);
 }
 
+void SetupDisplay::ZeroOut(LiquidCrystal& lcd)
+{
+    lcd.clear();
+    currentColumnIndex = 0;
+    currentRowIndex = 0;
+    currentLabelIndex = 0;
+}
+
 void SetupDisplay::UpdateDisplayAllRows(
     LiquidCrystal& lcd,
     bool& exitSetUpMode)
@@ -93,10 +101,12 @@ void SetupDisplay::UpdateDisplay(
     {
         case ButtonDirection::Left:
         {
+            currentColumnIndex = 0;
             break;
         }
         case ButtonDirection::Right:
         {
+            currentColumnIndex = 1;
             break;            
         }
         case ButtonDirection::Up:

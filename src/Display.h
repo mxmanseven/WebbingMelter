@@ -6,11 +6,11 @@
 #include "EeWrapper.h"
 
 enum ButtonDirection {
-    None,
-    Left,
-    Right,
-    Up,
-    Down
+    None,   // 0
+    Left,   // 1
+    Right,  // 2
+    Up,     // 3
+    Down    // 4
 };
 
 String FloatFormat(float f, uint8_t percision);
@@ -42,6 +42,8 @@ class SetupDisplay
         EeWrapper eeWrapper;
 
         SetupDisplay();
+
+        void ZeroOut(LiquidCrystal& lcd);
 
         void UpdateDisplayAllRows(
             LiquidCrystal& lcd,

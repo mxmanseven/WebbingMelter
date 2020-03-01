@@ -4,6 +4,7 @@
 #include <LiquidCrystal.h>
 
 #include "Display.h"
+#include "DisplayProd.h"
 
 enum TopLevelMode 
 {
@@ -26,6 +27,9 @@ uint8_t btnRightPin = PA7;
 uint8_t btnUpPin = PB1;
 uint8_t btnDownPin = PB0;
 
+// PB0 AND PA7 TRIGGER THE SAME ISR
+// DOWN AND RIGHT TRIGGER THE SAME ISR
+
 // LCD PINS
 uint8_t lcdRs = PA5;
 uint8_t lcdEnable = PA4;
@@ -35,7 +39,8 @@ uint8_t lcdD2 = PA1;
 uint8_t lcdD3 = PA0;
 
 LiquidCrystal lcd(lcdRs, lcdEnable, lcdD0, lcdD1, lcdD2, lcdD3);
-SetupDisplay display;
+SetupDisplay setupDisplay;
+DisplayProd displayProd;
 
 ButtonDirection buttonDirection;
 
@@ -44,7 +49,7 @@ void butLeftDown() {
 }
 
 void butRightDown() {
-  buttonDirection = ButtonDirection::Down;
+  buttonDirection = ButtonDirection::Right;
 }
 
 void butUpDown() {
@@ -85,7 +90,7 @@ void setup() {
   lcd.cursor();
   
   bool exitSetUpMode = false;
-  display.UpdateDisplayAllRows(lcd, exitSetUpMode);
+  setupDisplay.UpdateDisplayAllRows(lcd, exitSetUpMode);
   delay(1000);
 }
 
@@ -96,9 +101,17 @@ void loop()
     case TopLevelMode::SetUp:
     {      
       bool exitSetUpMode = false;
-      display.UpdateDisplay(lcd, buttonDirection, exitSetUpMode);
+      setupDisplay.UpdateDisplay(lcd, buttonDirection, exitSetUpMode);
       if (exitSetUpMode) {
         topLevelMode = TopLevelMode::Production;
+
+        setupDisplay.ZeroOut(lcd);
+
+        int runCount = setupDisplay.data.runCount;
+        displayProd.expectedRunCount = runCount;
+        displayProd.currentRunCount = 0;
+
+        displayProd.ShowCommandAndRunCount(lcd, "Prod Mode");
       }
       break;
     }
