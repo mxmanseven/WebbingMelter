@@ -168,13 +168,38 @@ void SetupDisplay::ChangeRowValue(
         if (labelIndex >= MELT_LABLE_INDEX || labelIndex <= CUT_LABLE_INDEX) {
             // row value is a float
             float rowValueF = rowValueStr.toFloat();
+            // use goofy values because of rounding and precision limits.
             float changeAmount = 0.01001;
-            if(direction == ButtonDirection::Down) changeAmount = changeAmount * -1;
+            if(direction == ButtonDirection::Down) changeAmount = -0.0099;
             rowValueF += changeAmount;
             rowValueStr = FloatFormat(rowValueF, 2);
             SetupDisplay::rowValues[labelIndex] = rowValueStr;
 
-            // knh todo - save new value to ee prom
+            switch (labelIndex)
+            {
+                case 1: // run count index
+                {
+                    data.runCount = (int)rowValueF;
+                    break;
+                }
+                case 2: // melt index
+                {
+                    data.meltSpeed = rowValueF;
+                    break;
+                }
+                case 3: // cool index
+                {
+                    data.coolSpeed = rowValueF;
+                    break;
+                }
+                case 4: // cut length index
+                {
+                    data.cutLength = rowValueF;
+                    break;
+                }
+            }
+
+            eeWrapper.Write(data);
         }
     }
 }
