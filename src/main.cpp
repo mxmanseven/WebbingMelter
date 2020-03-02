@@ -3,6 +3,8 @@
 #include <Wire.h>
 #include <LiquidCrystal.h>
 
+#include "BasicStepperDriver.h"
+
 #include "Display.h"
 #include "DisplayProd.h"
 
@@ -20,6 +22,26 @@ enum ProductionMode
 
 TopLevelMode topLevelMode;
 ProductionMode productionMode;
+
+
+// Motor steps per revolution. Most steppers are 200 steps or 1.8 degrees/step
+#define MOTOR_STEPS 200
+#define RPM 100
+
+// Since microstepping is set externally, make sure this matches the selected mode
+// If it doesn't, the motor will move at a different RPM than chosen
+// 1=full step, 2=half step etc.
+#define MICROSTEPS 8
+
+// All the wires needed for full functionality
+#define DIR PB12
+#define STEP PB13
+//Uncomment line to use enable/disable functionality
+//#define SLEEP 13
+
+// 2-wire basic config, microstepping is hardwired on the driver
+BasicStepperDriver stepper(MOTOR_STEPS, DIR, STEP);
+
 
 // nav button pins:
 uint8_t btnLeftPin = PB10;
@@ -100,10 +122,33 @@ void setup() {
   bool exitSetUpMode = false;
   setupDisplay.UpdateDisplayAllRows(lcd, exitSetUpMode);
   delay(1000);
+
+  
+  stepper.begin(RPM, MICROSTEPS);
 }
 
 void loop() 
 {
+
+  stepper.setRPM(100);
+  Serial.println("stepper.rotate(360)");
+  stepper.rotate(360);
+
+  
+  Serial.println("delay(5000)");
+  delay(1000);
+
+  stepper.setRPM(1);
+  Serial.println("stepper.rotate(360)");
+  stepper.rotate(30);
+
+  // Serial.println("stepper.move()");
+  // stepper.move(-MOTOR_STEPS*MICROSTEPS);
+
+  Serial.println("delay(5000)");
+  delay(1000);
+
+
   if(buttonDirection != ButtonDirection::None) {
     switch (topLevelMode) 
     {

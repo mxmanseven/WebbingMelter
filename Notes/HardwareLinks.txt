@@ -1,3 +1,11 @@
 
 Button Schmitt-Trigger:
     http://www.ti.com/lit/ds/symlink/sn74hc14.pdf
+
+Verticle Stepper:
+    https://www.omc-stepperonline.com/nema-17-bipolar-59ncm-84oz-in-2a-42x48mm-4-wires-w-1m-cable-and-connector.html
+    connections:
+        A+ Black
+        A- Green
+        B+ Red
+        B- Blue
