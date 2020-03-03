@@ -130,23 +130,23 @@ void setup() {
 void loop() 
 {
 
-  stepper.setRPM(100);
-  Serial.println("stepper.rotate(360)");
-  stepper.rotate(360);
+  // stepper.setRPM(100);
+  // Serial.println("stepper.rotate(360)");
+  // stepper.rotate(360);
 
   
-  Serial.println("delay(5000)");
-  delay(1000);
+  // Serial.println("delay(5000)");
+  // delay(1000);
 
-  stepper.setRPM(1);
-  Serial.println("stepper.rotate(360)");
-  stepper.rotate(30);
+  // stepper.setRPM(1);
+  // Serial.println("stepper.rotate(360)");
+  // stepper.rotate(30);
 
-  // Serial.println("stepper.move()");
-  // stepper.move(-MOTOR_STEPS*MICROSTEPS);
+  // // Serial.println("stepper.move()");
+  // // stepper.move(-MOTOR_STEPS*MICROSTEPS);
 
-  Serial.println("delay(5000)");
-  delay(1000);
+  // Serial.println("delay(5000)");
+  // delay(1000);
 
 
   if(buttonDirection != ButtonDirection::None) {

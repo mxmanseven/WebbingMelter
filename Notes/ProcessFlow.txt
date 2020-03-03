@@ -1,0 +1,40 @@
+
+add melt distance in menu
+  melt speeds not in menu
+
+
+  
+zero:
+  y up 3 inches
+  y down to switch (cool position)
+  y up to cut
+  x feed 
+  cut
+    relay hold for 1.5 seconds
+  roll
+    relay hold for 1.5 seconds
+  air
+    relay hold for 0.5 seconds    
+  x retract
+  
+run: (assume ready to melt)
+  y up to melt
+  x feed to melt
+  x back
+  y down to cool (switch)
+  x feed to cool
+  y up for cut
+  x feed for cut
+  cut
+  roll
+  air
+  x retract
+
+
+buy list
+  parts that i used
+    blue pill
+    st link
+    fdti serial
+    buttons
+    USB cable 
