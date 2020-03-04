@@ -9,3 +9,6 @@ Verticle Stepper:
         A- Green
         B+ Red
         B- Blue
+
+Relay module hook up:
+    1KOhm pull

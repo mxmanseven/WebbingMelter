@@ -23,34 +23,34 @@ enum ProductionMode
 TopLevelMode topLevelMode;
 ProductionMode productionMode;
 
-
 // Motor steps per revolution. Most steppers are 200 steps or 1.8 degrees/step
-#define MOTOR_STEPS 200
-#define RPM 100
+const int MOTOR_STEPS = 200;
 
 // Since microstepping is set externally, make sure this matches the selected mode
 // If it doesn't, the motor will move at a different RPM than chosen
 // 1=full step, 2=half step etc.
-#define MICROSTEPS 8
+const int MICROSTEPS = 8;
 
-// All the wires needed for full functionality
-#define DIR PB12
-#define STEP PB13
-//Uncomment line to use enable/disable functionality
-//#define SLEEP 13
+const int STEPPER_X_STEP_PIN = PB12;
+const int STEPPER_X_DIR_PIN = PB13;
 
-// 2-wire basic config, microstepping is hardwired on the driver
-BasicStepperDriver stepper(MOTOR_STEPS, DIR, STEP);
+const int STEPPER_Y_STEP_PIN = PB14;
+const int STEPPER_Y_DIR_PIN = PB15;
 
+BasicStepperDriver stepperX(MOTOR_STEPS, STEPPER_X_DIR_PIN, STEPPER_X_STEP_PIN);
+BasicStepperDriver stepperY(MOTOR_STEPS, STEPPER_X_DIR_PIN, STEPPER_X_STEP_PIN);
+
+const uint8_t Y_LIMIT_SWITCH_PIN = PB8;
+
+const uint8_t RELAY_CUT_PIN = PA11;
+const uint8_t RELAY_ROLL_PIN = PA12;
+const uint8_t RELAY_AIR_PIN = PA15;
 
 // nav button pins:
 uint8_t btnLeftPin = PB10;
 uint8_t btnRightPin = PA7;
 uint8_t btnUpPin = PB1;
 uint8_t btnDownPin = PB0;
-
-// PB0 AND PA7 TRIGGER THE SAME ISR
-// DOWN AND RIGHT TRIGGER THE SAME ISR
 
 // LCD PINS
 uint8_t lcdRs = PA5;
@@ -110,45 +110,38 @@ void initButtons() {
   attachInterrupt(btnDownPin, butDownDown, RISING);
 }
 
+void initRelay() {
+  pinMode(RELAY_CUT_PIN, INPUT_PULLUP);
+  pinMode(RELAY_ROLL_PIN, INPUT_PULLUP);
+  pinMode(RELAY_AIR_PIN, INPUT_PULLUP);
+
+  digitalWrite(RELAY_CUT_PIN, LOW);
+  digitalWrite(RELAY_ROLL_PIN, LOW);
+  digitalWrite(RELAY_AIR_PIN, LOW);
+
+}
+
 // the setup function runs once when you press reset or power the board
 void setup() {
   topLevelMode = TopLevelMode::SetUp;
   buttonDirection = ButtonDirection::None;
   initSerial();
   initButtons();
+  initRelay();  
+  pinMode(Y_LIMIT_SWITCH_PIN, INPUT_PULLDOWN);
   lcd.begin(20,4);
   lcd.cursor();
   
   bool exitSetUpMode = false;
   setupDisplay.UpdateDisplayAllRows(lcd, exitSetUpMode);
   delay(1000);
-
   
-  stepper.begin(RPM, MICROSTEPS);
+  stepperX.begin(60, MICROSTEPS);
+  stepperY.begin(60, MICROSTEPS);
 }
 
 void loop() 
 {
-
-  // stepper.setRPM(100);
-  // Serial.println("stepper.rotate(360)");
-  // stepper.rotate(360);
-
-  
-  // Serial.println("delay(5000)");
-  // delay(1000);
-
-  // stepper.setRPM(1);
-  // Serial.println("stepper.rotate(360)");
-  // stepper.rotate(30);
-
-  // // Serial.println("stepper.move()");
-  // // stepper.move(-MOTOR_STEPS*MICROSTEPS);
-
-  // Serial.println("delay(5000)");
-  // delay(1000);
-
-
   if(buttonDirection != ButtonDirection::None) {
     switch (topLevelMode) 
     {
@@ -179,4 +172,27 @@ void loop()
     Serial.println("button dir: " + String(buttonDirection));
     buttonDirection = ButtonDirection::None;
   }
+
+  int air = digitalRead(RELAY_AIR_PIN);
+  int cut = digitalRead(RELAY_CUT_PIN);
+  int roll = digitalRead(RELAY_ROLL_PIN);
+
+
+  // Serial.println("air: " + String(air) + " cut: " + String(cut) + " roll: " + String(roll));
+  // delay(5000);
+
+  // digitalWrite(RELAY_CUT_PIN, LOW);
+  // Serial.println("Cut enabled");
+  // delay(1000);
+  // digitalWrite(RELAY_CUT_PIN, HIGH);
+  
+  // digitalWrite(RELAY_ROLL_PIN, LOW);
+  // Serial.println("Roll enabled");
+  // delay(1000);
+  // digitalWrite(RELAY_ROLL_PIN, HIGH);
+
+  // digitalWrite(RELAY_AIR_PIN, LOW);
+  // Serial.println("Air enabled");
+  // delay(1000);
+  // digitalWrite(RELAY_AIR_PIN, HIGH);
 }
