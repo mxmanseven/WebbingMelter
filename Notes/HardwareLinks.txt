@@ -10,5 +10,8 @@ Verticle Stepper:
         B+ Red
         B- Blue
 
+Stepper Driver:
+    https://wiki.dfrobot.com/TB6600_Stepper_Motor_Driver_SKU__DRI0043
+
 Relay module hook up:
     1KOhm pull

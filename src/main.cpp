@@ -8,6 +8,14 @@
 #include "Display.h"
 #include "DisplayProd.h"
 
+
+const int X_DEGREES_PER_INCH = 185;
+const int Y_DEGREES_PER_INCH = 2215;
+const int X_RPM_STD = 60;
+const int X_RPM_MELT = 10;
+const int Y_RPM = 300;
+
+
 enum TopLevelMode 
 {
   SetUp,
@@ -31,20 +39,18 @@ const int MOTOR_STEPS = 200;
 // 1=full step, 2=half step etc.
 const int MICROSTEPS = 8;
 
-const int STEPPER_X_STEP_PIN = PB12;
-const int STEPPER_X_DIR_PIN = PB13;
+#define STEPPER_X_STEP_PIN PB12
+#define STEPPER_X_DIR_PIN PB13
 
-const int STEPPER_Y_STEP_PIN = PB14;
-const int STEPPER_Y_DIR_PIN = PB15;
+#define STEPPER_Y_STEP_PIN PB14
+#define STEPPER_Y_DIR_PIN PB15
 
 BasicStepperDriver stepperX(MOTOR_STEPS, STEPPER_X_DIR_PIN, STEPPER_X_STEP_PIN);
-BasicStepperDriver stepperY(MOTOR_STEPS, STEPPER_X_DIR_PIN, STEPPER_X_STEP_PIN);
+BasicStepperDriver stepperY(MOTOR_STEPS, STEPPER_Y_DIR_PIN, STEPPER_Y_STEP_PIN);
 
-const uint8_t Y_LIMIT_SWITCH_PIN = PB8;
-
-const uint8_t RELAY_CUT_PIN = PA11;
-const uint8_t RELAY_ROLL_PIN = PA12;
-const uint8_t RELAY_AIR_PIN = PA15;
+const uint8_t RELAY_CUT_PIN = PB6;
+const uint8_t RELAY_ROLL_PIN = PB7;
+const uint8_t RELAY_AIR_PIN = PB8;
 
 // nav button pins:
 uint8_t btnLeftPin = PB10;
@@ -111,14 +117,22 @@ void initButtons() {
 }
 
 void initRelay() {
-  pinMode(RELAY_CUT_PIN, INPUT_PULLUP);
-  pinMode(RELAY_ROLL_PIN, INPUT_PULLUP);
-  pinMode(RELAY_AIR_PIN, INPUT_PULLUP);
+  pinMode(RELAY_CUT_PIN, OUTPUT);
+  pinMode(RELAY_ROLL_PIN, OUTPUT);
+  pinMode(RELAY_AIR_PIN, OUTPUT);
 
-  digitalWrite(RELAY_CUT_PIN, LOW);
-  digitalWrite(RELAY_ROLL_PIN, LOW);
-  digitalWrite(RELAY_AIR_PIN, LOW);
+  digitalWrite(RELAY_CUT_PIN, HIGH);
+  digitalWrite(RELAY_ROLL_PIN, HIGH);
+  digitalWrite(RELAY_AIR_PIN, HIGH);
+  
+  // digitalWrite(RELAY_CUT_PIN, LOW);
+  // digitalWrite(RELAY_ROLL_PIN, LOW);
+  // digitalWrite(RELAY_AIR_PIN, LOW);
+}
 
+void initStepper()  {
+  stepperX.begin(X_RPM_MELT, MICROSTEPS);
+  stepperY.begin(Y_RPM, MICROSTEPS);
 }
 
 // the setup function runs once when you press reset or power the board
@@ -127,17 +141,14 @@ void setup() {
   buttonDirection = ButtonDirection::None;
   initSerial();
   initButtons();
-  initRelay();  
-  pinMode(Y_LIMIT_SWITCH_PIN, INPUT_PULLDOWN);
-  lcd.begin(20,4);
+  initRelay();
+  initStepper();
+
+  lcd.begin(20, 4);
   lcd.cursor();
-  
   bool exitSetUpMode = false;
   setupDisplay.UpdateDisplayAllRows(lcd, exitSetUpMode);
   delay(1000);
-  
-  stepperX.begin(60, MICROSTEPS);
-  stepperY.begin(60, MICROSTEPS);
 }
 
 void loop() 
@@ -173,26 +184,43 @@ void loop()
     buttonDirection = ButtonDirection::None;
   }
 
+  // Serial.println("x rotate 100");
+  // stepperX.rotate(360);
+  
+//   Serial.println("y rotate 10");
+//   stepperY.rotate(3600);
+
+//  delay(10000);
+  
+//   // Serial.println("x rotate -100");
+//   // stepperX.rotate(-360);
+  
+//   Serial.println("y rotate -10");
+//   stepperY.rotate(-3600);
+
+//  delay(10000);
+
   int air = digitalRead(RELAY_AIR_PIN);
   int cut = digitalRead(RELAY_CUT_PIN);
   int roll = digitalRead(RELAY_ROLL_PIN);
 
+  Serial.println("air: " + String(air) + " cut: " + String(cut) + " roll: " + String(roll));
 
-  // Serial.println("air: " + String(air) + " cut: " + String(cut) + " roll: " + String(roll));
-  // delay(5000);
-
-  // digitalWrite(RELAY_CUT_PIN, LOW);
-  // Serial.println("Cut enabled");
-  // delay(1000);
-  // digitalWrite(RELAY_CUT_PIN, HIGH);
+  delay(100);
+  digitalWrite(RELAY_CUT_PIN, LOW);
+  delay(1000);
+  Serial.println("Cut enabled");
+  digitalWrite(RELAY_CUT_PIN, HIGH);
   
-  // digitalWrite(RELAY_ROLL_PIN, LOW);
-  // Serial.println("Roll enabled");
-  // delay(1000);
-  // digitalWrite(RELAY_ROLL_PIN, HIGH);
+  delay(100);
+  digitalWrite(RELAY_ROLL_PIN, LOW);
+  delay(1000);
+  Serial.println("Roll enabled");
+  digitalWrite(RELAY_ROLL_PIN, HIGH);
 
-  // digitalWrite(RELAY_AIR_PIN, LOW);
-  // Serial.println("Air enabled");
-  // delay(1000);
-  // digitalWrite(RELAY_AIR_PIN, HIGH);
+  delay(100);
+  digitalWrite(RELAY_AIR_PIN, LOW);
+  delay(1000);
+  Serial.println("Air enabled");
+  digitalWrite(RELAY_AIR_PIN, HIGH);
 }
