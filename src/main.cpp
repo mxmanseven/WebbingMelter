@@ -8,13 +8,25 @@
 #include "Display.h"
 #include "DisplayProd.h"
 
-
 const int X_DEGREES_PER_INCH = 185;
 const int Y_DEGREES_PER_INCH = 2215;
 const int X_RPM_STD = 60;
 const int X_RPM_MELT = 10;
 const int Y_RPM = 300;
 
+const int X_SAFE_TO_HOT_COOL_PLATE_DEGREES = X_DEGREES_PER_INCH * 0.5;
+const int X_HOT_COOL_PLATE_TO_CUT_DEGREES = X_DEGREES_PER_INCH * 0.75;
+const int X_MELT_DEGREES = X_DEGREES_PER_INCH * 0.1; // knh todo - get form display
+const int X_CUT_LENGTH_DEGREES = X_DEGREES_PER_INCH * 4.9; // knh todo - get from display
+
+const int Y_TOPOUT_TO_MELT_DEGREES = Y_DEGREES_PER_INCH * 3.0;
+const int Y_MELT_TO_CUT_DEGREES = Y_DEGREES_PER_INCH * 1.0;
+const int Y_CUT_TO_COOL_DEGREES = Y_DEGREES_PER_INCH * 1.0;
+const int Y_TOPOUT_EXTRA_DEGREES = Y_DEGREES_PER_INCH * 0.1;
+
+const int CUT_RELAY_DURATION_MS = 1500;
+const int RELAY_ROLL_DURATION_MS = 1500;
+const int RELAY_AIR_DURATION_MS = 500;
 
 enum TopLevelMode 
 {
@@ -124,14 +136,10 @@ void initRelay() {
   digitalWrite(RELAY_CUT_PIN, HIGH);
   digitalWrite(RELAY_ROLL_PIN, HIGH);
   digitalWrite(RELAY_AIR_PIN, HIGH);
-  
-  // digitalWrite(RELAY_CUT_PIN, LOW);
-  // digitalWrite(RELAY_ROLL_PIN, LOW);
-  // digitalWrite(RELAY_AIR_PIN, LOW);
 }
 
 void initStepper()  {
-  stepperX.begin(X_RPM_MELT, MICROSTEPS);
+  stepperX.begin(X_RPM_STD, MICROSTEPS);
   stepperY.begin(Y_RPM, MICROSTEPS);
 }
 
@@ -184,43 +192,80 @@ void loop()
     buttonDirection = ButtonDirection::None;
   }
 
-  // Serial.println("x rotate 100");
-  // stepperX.rotate(360);
+  int d = 1500;
+
+  // zero out on top plate
+  Serial.println("zero out on top plate");
+  stepperY.rotate(Y_TOPOUT_TO_MELT_DEGREES + Y_MELT_TO_CUT_DEGREES + Y_TOPOUT_EXTRA_DEGREES);
   
-//   Serial.println("y rotate 10");
-//   stepperY.rotate(3600);
+  // move down to cut
+  Serial.println("move down to cut");
+  stepperY.rotate(-1 * (Y_TOPOUT_TO_MELT_DEGREES + Y_MELT_TO_CUT_DEGREES));
+  delay(d);
 
-//  delay(10000);
-  
-//   // Serial.println("x rotate -100");
-//   // stepperX.rotate(-360);
-  
-//   Serial.println("y rotate -10");
-//   stepperY.rotate(-3600);
+  // feed for cut from safe position
+  Serial.println("feed for cut from safe position");
+  stepperX.rotate(X_SAFE_TO_HOT_COOL_PLATE_DEGREES + X_HOT_COOL_PLATE_TO_CUT_DEGREES + X_CUT_LENGTH_DEGREES);
+  // un-do for now
+  // knh todo - remove when in prod
+  Serial.println("un-do for now");
+  stepperX.rotate(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES + X_HOT_COOL_PLATE_TO_CUT_DEGREES + X_CUT_LENGTH_DEGREES));
+  delay(d);
 
-//  delay(10000);
-
-  int air = digitalRead(RELAY_AIR_PIN);
-  int cut = digitalRead(RELAY_CUT_PIN);
-  int roll = digitalRead(RELAY_ROLL_PIN);
-
-  Serial.println("air: " + String(air) + " cut: " + String(cut) + " roll: " + String(roll));
-
-  delay(100);
+  // relay cut
+  Serial.println("relay cut");
   digitalWrite(RELAY_CUT_PIN, LOW);
-  delay(1000);
-  Serial.println("Cut enabled");
+  delay(CUT_RELAY_DURATION_MS);
   digitalWrite(RELAY_CUT_PIN, HIGH);
-  
-  delay(100);
+
+  // Roll
+  Serial.println("Roll");
   digitalWrite(RELAY_ROLL_PIN, LOW);
-  delay(1000);
-  Serial.println("Roll enabled");
+  delay(RELAY_ROLL_DURATION_MS);
   digitalWrite(RELAY_ROLL_PIN, HIGH);
 
-  delay(100);
+  // Air
+  Serial.println("Air");
   digitalWrite(RELAY_AIR_PIN, LOW);
-  delay(1000);
-  Serial.println("Air enabled");
+  delay(RELAY_AIR_DURATION_MS);
   digitalWrite(RELAY_AIR_PIN, HIGH);
+
+  // retract back to safety
+  Serial.println("retract back to safety");
+  stepperX.move(-1 * (X_HOT_COOL_PLATE_TO_CUT_DEGREES));
+  delay(d);
+
+  // up to melt
+  Serial.println("up to melt");
+  stepperY.move(Y_MELT_TO_CUT_DEGREES);
+  delay(d);
+
+  // feed to melt
+  Serial.println("feed to melt");
+  stepperX.move(X_SAFE_TO_HOT_COOL_PLATE_DEGREES);
+  stepperX.setRPM(X_RPM_MELT);
+  delay(d);
+  stepperX.move(X_MELT_DEGREES);
+  stepperX.setRPM(X_RPM_STD);
+  delay(d);
+  
+  // retract to safety
+  Serial.println("retract to safety");
+  stepperX.move(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES));
+  delay(d);
+
+  // down to cool
+  Serial.println("down to cool");
+  stepperY.move(-1 * (Y_MELT_TO_CUT_DEGREES + Y_CUT_TO_COOL_DEGREES));
+  delay(d);
+
+  // feed to cool
+  Serial.println("feed to cool");
+  stepperX.move(X_SAFE_TO_HOT_COOL_PLATE_DEGREES);
+  delay(d);
+
+  // retract to safety
+  Serial.println("retract to safety");
+  stepperX.move(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES));
+   delay(d);
 }
