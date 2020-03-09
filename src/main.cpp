@@ -11,12 +11,12 @@
 const int X_DEGREES_PER_INCH = 185;
 const int Y_DEGREES_PER_INCH = 2215;
 const int X_RPM_STD = 60;
-const int X_RPM_MELT = 10;
+const int X_RPM_MELT = 1;
 const int Y_RPM = 300;
 
 const int X_SAFE_TO_HOT_COOL_PLATE_DEGREES = X_DEGREES_PER_INCH * 0.5;
 const int X_HOT_COOL_PLATE_TO_CUT_DEGREES = X_DEGREES_PER_INCH * 0.75;
-const int X_MELT_DEGREES = X_DEGREES_PER_INCH * 0.1; // knh todo - get form display
+const int X_MELT_DEGREES = X_DEGREES_PER_INCH * 0.2; // knh todo - get form display
 const int X_CUT_LENGTH_DEGREES = X_DEGREES_PER_INCH * 4.9; // knh todo - get from display
 
 const int Y_TOPOUT_TO_MELT_DEGREES = Y_DEGREES_PER_INCH * 3.0;
@@ -192,80 +192,116 @@ void loop()
     buttonDirection = ButtonDirection::None;
   }
 
-  int d = 1500;
+  int d = 1000;
 
   // zero out on top plate
   Serial.println("zero out on top plate");
-  stepperY.rotate(Y_TOPOUT_TO_MELT_DEGREES + Y_MELT_TO_CUT_DEGREES + Y_TOPOUT_EXTRA_DEGREES);
+  lcd.setCursor(0, 3);
+  lcd.print("zero out on top plat");
+  stepperY.rotate(
+      Y_TOPOUT_TO_MELT_DEGREES 
+      + Y_MELT_TO_CUT_DEGREES
+      + Y_CUT_TO_COOL_DEGREES 
+      + Y_TOPOUT_EXTRA_DEGREES);
+  delay(d);
   
   // move down to cut
   Serial.println("move down to cut");
+  lcd.setCursor(0, 3);
+  lcd.print("move down to cut    ");
   stepperY.rotate(-1 * (Y_TOPOUT_TO_MELT_DEGREES + Y_MELT_TO_CUT_DEGREES));
   delay(d);
 
   // feed for cut from safe position
   Serial.println("feed for cut from safe position");
+  lcd.setCursor(0, 3);
+  lcd.print("feed for cut from sa");
   stepperX.rotate(X_SAFE_TO_HOT_COOL_PLATE_DEGREES + X_HOT_COOL_PLATE_TO_CUT_DEGREES + X_CUT_LENGTH_DEGREES);
+  delay(d);
   // un-do for now
   // knh todo - remove when in prod
-  Serial.println("un-do for now");
-  stepperX.rotate(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES + X_HOT_COOL_PLATE_TO_CUT_DEGREES + X_CUT_LENGTH_DEGREES));
-  delay(d);
+  // Serial.println("un-do for now");
+  // lcd.setCursor(0, 3);
+  // lcd.print("un-do for now       ");
+  // stepperX.rotate(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES + X_HOT_COOL_PLATE_TO_CUT_DEGREES + X_CUT_LENGTH_DEGREES));
+  // delay(d);
 
   // relay cut
   Serial.println("relay cut");
+  lcd.setCursor(0, 3);
+  lcd.print("Relay Cut           ");
   digitalWrite(RELAY_CUT_PIN, LOW);
   delay(CUT_RELAY_DURATION_MS);
   digitalWrite(RELAY_CUT_PIN, HIGH);
 
   // Roll
   Serial.println("Roll");
+  lcd.setCursor(0, 3);
+  lcd.print("Relay Roll          ");
   digitalWrite(RELAY_ROLL_PIN, LOW);
   delay(RELAY_ROLL_DURATION_MS);
   digitalWrite(RELAY_ROLL_PIN, HIGH);
 
   // Air
   Serial.println("Air");
+  lcd.setCursor(0, 3);
+  lcd.print("Relay Air           ");  
   digitalWrite(RELAY_AIR_PIN, LOW);
   delay(RELAY_AIR_DURATION_MS);
   digitalWrite(RELAY_AIR_PIN, HIGH);
 
   // retract back to safety
   Serial.println("retract back to safety");
+  lcd.setCursor(0, 3);
+  lcd.print("retract back to safe");
   stepperX.move(-1 * (X_HOT_COOL_PLATE_TO_CUT_DEGREES));
   delay(d);
 
   // up to melt
   Serial.println("up to melt");
+  lcd.setCursor(0, 3);
+  lcd.print("up to melt           ");
   stepperY.move(Y_MELT_TO_CUT_DEGREES);
   delay(d);
 
   // feed to melt
   Serial.println("feed to melt");
+  lcd.setCursor(0, 3);
+  lcd.print("feed to melt         ");
   stepperX.move(X_SAFE_TO_HOT_COOL_PLATE_DEGREES);
   stepperX.setRPM(X_RPM_MELT);
   delay(d);
+  lcd.setCursor(0, 3);
+  lcd.print("Melt                ");
   stepperX.move(X_MELT_DEGREES);
   stepperX.setRPM(X_RPM_STD);
   delay(d);
   
   // retract to safety
   Serial.println("retract to safety");
+  lcd.setCursor(0, 3);
+  lcd.print("retract to safety   ");
   stepperX.move(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES));
   delay(d);
 
   // down to cool
   Serial.println("down to cool");
+  lcd.setCursor(0, 3);
+  lcd.print("down to cool        ");
   stepperY.move(-1 * (Y_MELT_TO_CUT_DEGREES + Y_CUT_TO_COOL_DEGREES));
   delay(d);
 
   // feed to cool
   Serial.println("feed to cool");
+  lcd.setCursor(0, 3);
+  lcd.print("feed to cool        ");
   stepperX.move(X_SAFE_TO_HOT_COOL_PLATE_DEGREES);
   delay(d);
 
   // retract to safety
   Serial.println("retract to safety");
+  lcd.setCursor(0, 3);
+  lcd.print("retract to safety   ");
   stepperX.move(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES));
    delay(d);
 }
