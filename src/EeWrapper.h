@@ -4,7 +4,8 @@
 struct PersistantData
 {
     int runCount;
-    float meltSpeed;
+    int lifeTimerunCount;
+    float meltDist;
     float coolSpeed;
     float cutLength;
 };

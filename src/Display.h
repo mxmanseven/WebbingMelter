@@ -23,15 +23,17 @@ class SetupDisplay
         static const int LABEL_COUNT = 5;
 
         const char* RUN_LABEL = "Run";
+        const char* LIFETIME_RUN_LABEL = "Lifetime Runs";
         const char* RUN_COUNT_LABEL =  "Run Count";
-        const char* MELT_SPEED_LABEL = "Melt Speed";
-        const char* COOL_SPEED_LABEL = "Cool Speed";
+        const char* MELT_DIST_LABEL = "Melt Dist";
+        //const char* COOL_SPEED_LABEL = "Cool Speed";
         const char* CUT_LENGTH_LABEL = "Cut Length";
 
         const int RUN_LABLE_INDEX = 0;
-        const int RUN_COUNT_LABLE_INDEX = 1;
-        const int MELT_LABLE_INDEX = 2;
-        const int COOL_LABLE_INDEX = 3;
+        const int LIFETIME_RUN_LABLE_INDEX = 1;
+        const int RUN_COUNT_LABLE_INDEX = 2;
+        const int MELT_LABLE_INDEX = 3;
+        //const int COOL_LABLE_INDEX = 4;
         const int CUT_LABLE_INDEX = 4;
 
         String rowLabels[LABEL_COUNT];
@@ -64,6 +66,8 @@ class SetupDisplay
             int rowIndex,
             ButtonDirection direction,
             bool& exitSetUpMode);
+
+        void WritePersistantDate();
 };
 
 #endif

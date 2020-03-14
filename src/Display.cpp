@@ -37,18 +37,20 @@ String FloatFormat(float f, uint8_t percision)
 
 SetupDisplay::SetupDisplay() {
     SetupDisplay::rowLabels[0] = SetupDisplay::RUN_LABEL;
-    SetupDisplay::rowLabels[1] = SetupDisplay::RUN_COUNT_LABEL;
-    SetupDisplay::rowLabels[2] = SetupDisplay::MELT_SPEED_LABEL;
-    SetupDisplay::rowLabels[3] = SetupDisplay::COOL_SPEED_LABEL;
+    SetupDisplay::rowLabels[1] = SetupDisplay::LIFETIME_RUN_LABEL;
+    SetupDisplay::rowLabels[2] = SetupDisplay::RUN_COUNT_LABEL;
+    SetupDisplay::rowLabels[3] = SetupDisplay::MELT_DIST_LABEL;
+    //SetupDisplay::rowLabels[3] = SetupDisplay::COOL_SPEED_LABEL;
     SetupDisplay::rowLabels[4] = SetupDisplay::CUT_LENGTH_LABEL;
     currentColumnIndex = 0;
     currentLabelIndex = 0;
 
     eeWrapper.Get(data);
     SetupDisplay::rowValues[0] = "Go";
-    SetupDisplay::rowValues[1] = String(data.runCount);
-    SetupDisplay::rowValues[2] = FloatFormat(data.meltSpeed, 2);
-    SetupDisplay::rowValues[3] = FloatFormat(data.coolSpeed, 2);
+    SetupDisplay::rowValues[1] = String(data.lifeTimerunCount);
+    SetupDisplay::rowValues[2] = String(data.runCount);
+    SetupDisplay::rowValues[3] = FloatFormat(data.meltDist, 2);
+    //SetupDisplay::rowValues[3] = FloatFormat(data.coolSpeed, 2);
     SetupDisplay::rowValues[4] = FloatFormat(data.cutLength, 3);
 }
 
@@ -179,22 +181,22 @@ void SetupDisplay::ChangeRowValue(
 
             switch (labelIndex)
             {
-                case 1: // run count index
+                case 2: // run count index
                 {
                     data.runCount = (int)rowValueF;
                     SetupDisplay::rowValues[labelIndex] = String(data.runCount);
                     break;
                 }
-                case 2: // melt index
+                case 3: // melt index
                 {
-                    data.meltSpeed = rowValueF;
+                    data.meltDist = rowValueF;
                     break;
                 }
-                case 3: // cool index
-                {
-                    data.coolSpeed = rowValueF;
-                    break;
-                }
+                // case 3: // cool index
+                // {
+                //     data.coolSpeed = rowValueF;
+                //     break;
+                // }
                 case 4: // cut length index
                 {
                     data.cutLength = rowValueF;
@@ -202,7 +204,12 @@ void SetupDisplay::ChangeRowValue(
                 }
             }
 
-            eeWrapper.Write(data);
+            //eeWrapper.Write(data);
+            WritePersistantDate();
         }
     }
+}
+
+void SetupDisplay::WritePersistantDate() { 
+    eeWrapper.Write(data);
 }

@@ -8,6 +8,7 @@ void EeWrapper::Get(PersistantData& data)
 { 
     EEPROM.get(EEPROM_INDEX, data);
 
+    data.lifeTimerunCount = 1;
     // data.coolSpeed = 12;
     // data.meltSpeed = 1.9;
      //data.runCount = 12;
@@ -24,7 +25,7 @@ void EeWrapper::Test()
   PersistantData data;
   Get(data);
   data.coolSpeed = 12;
-  data.meltSpeed = 123;
+  data.meltDist = 123;
   data.runCount = 12345;
   data.cutLength = 4.125;
 

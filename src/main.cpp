@@ -306,14 +306,15 @@ void loop()
   }
 
   if (topLevelMode == TopLevelMode::Production)
-  {
-    int runCount = setupDisplay.data.runCount;
-    displayProd.expectedRunCount = runCount;
+  {    
+    displayProd.expectedRunCount = setupDisplay.data.runCount;
     displayProd.currentRunCount = 0;
-    for(int i = 0; i < runCount; i++) {
+    for(int i = 0; i < setupDisplay.data.runCount; i++) {
       doProductionCycle();
       displayProd.currentRunCount = i + 1;
       displayProd.ShowRunCount(lcd);
+      setupDisplay.data.lifeTimerunCount++;
+      setupDisplay.WritePersistantDate();
     }
 
     topLevelMode = TopLevelMode::SetUp;
