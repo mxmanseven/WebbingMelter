@@ -10,11 +10,11 @@
 
 const int X_DEGREES_PER_INCH = 185;
 const int Y_DEGREES_PER_INCH = 2215;
-const int X_RPM_STD = 60;
-const int X_RPM_MELT = 1;
+const int X_RPM_STD = 80;
+const float X_RPM_MELT = 0.5;
 const int Y_RPM = 300;
 
-const int X_SAFE_TO_HOT_COOL_PLATE_DEGREES = X_DEGREES_PER_INCH * 0.5;
+const int X_SAFE_TO_HOT_COOL_PLATE_DEGREES = X_DEGREES_PER_INCH * 0.8;
 const int X_HOT_COOL_PLATE_TO_CUT_DEGREES = X_DEGREES_PER_INCH * 0.75;
 const int X_MELT_DEGREES = X_DEGREES_PER_INCH * 0.2; // knh todo - get form display
 const int X_CUT_LENGTH_DEGREES = X_DEGREES_PER_INCH * 4.9; // knh todo - get from display
@@ -25,8 +25,8 @@ const int Y_CUT_TO_COOL_DEGREES = Y_DEGREES_PER_INCH * 1.0;
 const int Y_TOPOUT_EXTRA_DEGREES = Y_DEGREES_PER_INCH * 0.1;
 
 const int CUT_RELAY_DURATION_MS = 1500;
-const int RELAY_ROLL_DURATION_MS = 1500;
-const int RELAY_AIR_DURATION_MS = 500;
+const int RELAY_ROLL_DURATION_MS = 3000;
+const int RELAY_AIR_DURATION_MS = 1000;
 
 enum TopLevelMode 
 {
@@ -63,6 +63,7 @@ BasicStepperDriver stepperY(MOTOR_STEPS, STEPPER_Y_DIR_PIN, STEPPER_Y_STEP_PIN);
 const uint8_t RELAY_CUT_PIN = PB6;
 const uint8_t RELAY_ROLL_PIN = PB7;
 const uint8_t RELAY_AIR_PIN = PB8;
+const uint8_t RELAY_WHEEL_PIN = PB9;
 
 // nav button pins:
 uint8_t btnLeftPin = PB10;
@@ -132,10 +133,12 @@ void initRelay() {
   pinMode(RELAY_CUT_PIN, OUTPUT);
   pinMode(RELAY_ROLL_PIN, OUTPUT);
   pinMode(RELAY_AIR_PIN, OUTPUT);
+  pinMode(RELAY_WHEEL_PIN, OUTPUT);
 
   digitalWrite(RELAY_CUT_PIN, HIGH);
   digitalWrite(RELAY_ROLL_PIN, HIGH);
   digitalWrite(RELAY_AIR_PIN, HIGH);
+  digitalWrite(RELAY_WHEEL_PIN, HIGH);
 }
 
 void initStepper()  {
@@ -159,40 +162,9 @@ void setup() {
   delay(1000);
 }
 
-void loop() 
-{
-  if(buttonDirection != ButtonDirection::None) {
-    switch (topLevelMode) 
-    {
-      case TopLevelMode::SetUp:
-      {      
-        bool exitSetUpMode = false;
-        setupDisplay.UpdateDisplay(lcd, buttonDirection, exitSetUpMode);
-        
-        if (exitSetUpMode) {
-          topLevelMode = TopLevelMode::Production;
+void doProductionCycle() {
 
-          setupDisplay.ZeroOut(lcd);
-
-          int runCount = setupDisplay.data.runCount;
-          displayProd.expectedRunCount = runCount;
-          displayProd.currentRunCount = 0;
-
-          displayProd.ShowCommandAndRunCount(lcd, "Prod Mode");
-        }
-        break;
-      }
-      case TopLevelMode::Production:
-      {
-        break;
-      }
-    }
-
-    Serial.println("button dir: " + String(buttonDirection));
-    buttonDirection = ButtonDirection::None;
-  }
-
-  int d = 1000;
+  int d = 1;
 
   // zero out on top plate
   Serial.println("zero out on top plate");
@@ -211,6 +183,11 @@ void loop()
   lcd.print("move down to cut    ");
   stepperY.rotate(-1 * (Y_TOPOUT_TO_MELT_DEGREES + Y_MELT_TO_CUT_DEGREES));
   delay(d);
+
+  // Open Wheels
+  Serial.println("Open Wheels");
+  digitalWrite(RELAY_ROLL_PIN, HIGH);
+  delay(1000);
 
   // feed for cut from safe position
   Serial.println("feed for cut from safe position");
@@ -233,6 +210,12 @@ void loop()
   digitalWrite(RELAY_CUT_PIN, LOW);
   delay(CUT_RELAY_DURATION_MS);
   digitalWrite(RELAY_CUT_PIN, HIGH);
+  delay(1000);
+
+  // Close Wheels
+  Serial.println("Close Wheels");
+  digitalWrite(RELAY_ROLL_PIN, LOW);
+  delay(1000);
 
   // Roll
   Serial.println("Roll");
@@ -304,4 +287,47 @@ void loop()
   lcd.print("retract to safety   ");
   stepperX.move(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES));
    delay(d);
+}
+
+void loop() 
+{
+  if(buttonDirection != ButtonDirection::None) {
+    switch (topLevelMode) 
+    {
+      case TopLevelMode::SetUp:
+      {      
+        bool exitSetUpMode = false;
+        setupDisplay.UpdateDisplay(lcd, buttonDirection, exitSetUpMode);
+        
+        if (exitSetUpMode) {
+          topLevelMode = TopLevelMode::Production;
+
+          setupDisplay.ZeroOut(lcd);
+
+          int runCount = setupDisplay.data.runCount;
+          displayProd.expectedRunCount = runCount;
+          displayProd.currentRunCount = 0;
+
+          displayProd.ShowCommandAndRunCount(lcd, "Prod Mode");
+        }
+        break;
+      }
+    }
+
+    Serial.println("button dir: " + String(buttonDirection));
+    buttonDirection = ButtonDirection::None;
+  }
+
+  if (topLevelMode == TopLevelMode::Production)
+  {
+    int runCount = setupDisplay.data.runCount;
+    displayProd.expectedRunCount = runCount;
+    displayProd.currentRunCount = 0;
+    for(int i = 0; i < runCount; i++) {
+      doProductionCycle();
+      displayProd.currentRunCount = i + 1;
+    }
+    
+    topLevelMode = TopLevelMode::SetUp;
+  }
 }

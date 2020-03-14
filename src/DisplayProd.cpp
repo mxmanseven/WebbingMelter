@@ -9,8 +9,7 @@ DisplayProd::DisplayProd()
 void DisplayProd::ShowCommandAndRunCount(
             LiquidCrystal& lcd,
             char* commandStr)
-{
-    
+{    
     lcd.setCursor(0,0);
     char buff[21];
     snprintf(buff, 21, "%s", commandStr);
@@ -23,4 +22,14 @@ void DisplayProd::ShowCommandAndRunCount(
         expectedRunCount);
 
     lcd.print(buff);    
+}
+
+void DisplayProd::SetCommand(
+            LiquidCrystal& lcd,
+            char* commandStr)
+{    
+    lcd.setCursor(0,0);
+    char buff[21];
+    snprintf(buff, 21, "%s", commandStr);
+    lcd.print(buff);
 }
