@@ -12,9 +12,8 @@ class DisplayProd
         
         DisplayProd();
 
-        void ShowCommandAndRunCount(
-            LiquidCrystal& lcd,
-            char* commandStr);
+        void ShowRunCount(
+            LiquidCrystal& lcd);
 
         void SetCommand(
             LiquidCrystal& lcd,

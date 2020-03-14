@@ -168,8 +168,7 @@ void doProductionCycle() {
 
   // zero out on top plate
   Serial.println("zero out on top plate");
-  lcd.setCursor(0, 3);
-  lcd.print("zero out on top plat");
+  displayProd.SetCommand(lcd, "zero out on top plat");
   stepperY.rotate(
       Y_TOPOUT_TO_MELT_DEGREES 
       + Y_MELT_TO_CUT_DEGREES
@@ -179,8 +178,7 @@ void doProductionCycle() {
   
   // move down to cut
   Serial.println("move down to cut");
-  lcd.setCursor(0, 3);
-  lcd.print("move down to cut    ");
+  displayProd.SetCommand(lcd, "move down to cut    ");
   stepperY.rotate(-1 * (Y_TOPOUT_TO_MELT_DEGREES + Y_MELT_TO_CUT_DEGREES));
   delay(d);
 
@@ -191,8 +189,7 @@ void doProductionCycle() {
 
   // feed for cut from safe position
   Serial.println("feed for cut from safe position");
-  lcd.setCursor(0, 3);
-  lcd.print("feed for cut from sa");
+  displayProd.SetCommand(lcd, "feed for cut from sa");
   stepperX.rotate(X_SAFE_TO_HOT_COOL_PLATE_DEGREES + X_HOT_COOL_PLATE_TO_CUT_DEGREES + X_CUT_LENGTH_DEGREES);
   delay(d);
   // un-do for now
@@ -205,8 +202,7 @@ void doProductionCycle() {
 
   // relay cut
   Serial.println("relay cut");
-  lcd.setCursor(0, 3);
-  lcd.print("Relay Cut           ");
+  displayProd.SetCommand(lcd, "Relay Cut           ");
   digitalWrite(RELAY_CUT_PIN, LOW);
   delay(CUT_RELAY_DURATION_MS);
   digitalWrite(RELAY_CUT_PIN, HIGH);
@@ -219,72 +215,62 @@ void doProductionCycle() {
 
   // Roll
   Serial.println("Roll");
-  lcd.setCursor(0, 3);
-  lcd.print("Relay Roll          ");
+  displayProd.SetCommand(lcd, "Relay Roll          ");
   digitalWrite(RELAY_ROLL_PIN, LOW);
   delay(RELAY_ROLL_DURATION_MS);
   digitalWrite(RELAY_ROLL_PIN, HIGH);
 
   // Air
   Serial.println("Air");
-  lcd.setCursor(0, 3);
-  lcd.print("Relay Air           ");  
+  displayProd.SetCommand(lcd, "Relay Air           ");  
   digitalWrite(RELAY_AIR_PIN, LOW);
   delay(RELAY_AIR_DURATION_MS);
   digitalWrite(RELAY_AIR_PIN, HIGH);
 
   // retract back to safety
   Serial.println("retract back to safety");
-  lcd.setCursor(0, 3);
-  lcd.print("retract back to safe");
+  displayProd.SetCommand(lcd, "retract back to safe");
   stepperX.move(-1 * (X_HOT_COOL_PLATE_TO_CUT_DEGREES));
   delay(d);
 
   // up to melt
   Serial.println("up to melt");
-  lcd.setCursor(0, 3);
-  lcd.print("up to melt           ");
+  displayProd.SetCommand(lcd, "up to melt           ");
   stepperY.move(Y_MELT_TO_CUT_DEGREES);
   delay(d);
 
   // feed to melt
   Serial.println("feed to melt");
-  lcd.setCursor(0, 3);
-  lcd.print("feed to melt         ");
+  displayProd.SetCommand(lcd, "feed to melt         ");
   stepperX.move(X_SAFE_TO_HOT_COOL_PLATE_DEGREES);
   stepperX.setRPM(X_RPM_MELT);
   delay(d);
-  lcd.setCursor(0, 3);
-  lcd.print("Melt                ");
+  displayProd.SetCommand(lcd, "Melt                ");
   stepperX.move(X_MELT_DEGREES);
   stepperX.setRPM(X_RPM_STD);
   delay(d);
   
   // retract to safety
   Serial.println("retract to safety");
-  lcd.setCursor(0, 3);
-  lcd.print("retract to safety   ");
+  displayProd.SetCommand(lcd, "retract to safety   ");
   stepperX.move(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES));
   delay(d);
 
   // down to cool
   Serial.println("down to cool");
-  lcd.setCursor(0, 3);
-  lcd.print("down to cool        ");
+  displayProd.SetCommand(lcd, "down to cool        ");
   stepperY.move(-1 * (Y_MELT_TO_CUT_DEGREES + Y_CUT_TO_COOL_DEGREES));
   delay(d);
 
   // feed to cool
   Serial.println("feed to cool");
-  lcd.setCursor(0, 3);
-  lcd.print("feed to cool        ");
+  displayProd.SetCommand(lcd, "feed to cool        ");
   stepperX.move(X_SAFE_TO_HOT_COOL_PLATE_DEGREES);
   delay(d);
 
   // retract to safety
   Serial.println("retract to safety");
-  lcd.setCursor(0, 3);
-  lcd.print("retract to safety   ");
+  displayProd.SetCommand(lcd, "retract to safety   ");
   stepperX.move(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES));
    delay(d);
 }
@@ -308,7 +294,8 @@ void loop()
           displayProd.expectedRunCount = runCount;
           displayProd.currentRunCount = 0;
 
-          displayProd.ShowCommandAndRunCount(lcd, "Prod Mode");
+          displayProd.ShowRunCount(lcd);
+          displayProd.SetCommand(lcd, "Prod Mode");
         }
         break;
       }
@@ -326,8 +313,9 @@ void loop()
     for(int i = 0; i < runCount; i++) {
       doProductionCycle();
       displayProd.currentRunCount = i + 1;
+      displayProd.ShowRunCount(lcd);
     }
-    
+
     topLevelMode = TopLevelMode::SetUp;
   }
 }

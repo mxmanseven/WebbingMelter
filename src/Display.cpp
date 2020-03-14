@@ -165,12 +165,14 @@ void SetupDisplay::ChangeRowValue(
     }
     else {
         String rowValueStr = SetupDisplay::rowValues[labelIndex];
-        if (labelIndex >= MELT_LABLE_INDEX || labelIndex <= CUT_LABLE_INDEX) {
+        if (labelIndex >= RUN_COUNT_LABLE_INDEX && labelIndex <= CUT_LABLE_INDEX) {
             // row value is a float
             float rowValueF = rowValueStr.toFloat();
             // use goofy values because of rounding and precision limits.
             float changeAmount = 0.01001;
             if(direction == ButtonDirection::Down) changeAmount = -0.0099;
+
+            if(labelIndex == RUN_COUNT_LABLE_INDEX) changeAmount = changeAmount * 100;
             rowValueF += changeAmount;
             rowValueStr = FloatFormat(rowValueF, 2);
             SetupDisplay::rowValues[labelIndex] = rowValueStr;
@@ -180,6 +182,7 @@ void SetupDisplay::ChangeRowValue(
                 case 1: // run count index
                 {
                     data.runCount = (int)rowValueF;
+                    SetupDisplay::rowValues[labelIndex] = String(data.runCount);
                     break;
                 }
                 case 2: // melt index
