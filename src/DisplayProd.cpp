@@ -12,7 +12,7 @@ void DisplayProd::ShowRunCount(
     lcd.setCursor(0,0);
     char buff[21];
     snprintf(buff, 21, 
-        "Run %d / %d",
+        "RUN %d / %d",
         currentRunCount,
         expectedRunCount);
 
@@ -21,10 +21,10 @@ void DisplayProd::ShowRunCount(
 
 void DisplayProd::SetCommand(
             LiquidCrystal& lcd,
-            char* commandStr)
+            const char* commandStr)
 {    
     lcd.setCursor(0,1);
-    char buff[21];
-    snprintf(buff, 21, "%s", commandStr);
+    char buff[20];
+    snprintf(buff, 20, "%s", commandStr);
     lcd.print(buff);
 }

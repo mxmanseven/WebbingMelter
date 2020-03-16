@@ -17,7 +17,7 @@ class DisplayProd
 
         void SetCommand(
             LiquidCrystal& lcd,
-            char* commandStr);
+            const char* commandStr);
 };
 
 #endif

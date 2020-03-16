@@ -22,18 +22,16 @@ class SetupDisplay
         const int LCD_ROW_COUNT = 4;
         static const int LABEL_COUNT = 5;
 
-        const char* RUN_LABEL = "Run";
-        const char* LIFETIME_RUN_LABEL = "Lifetime";
-        const char* RUN_COUNT_LABEL =  "Run Count";
-        const char* MELT_DIST_LABEL = "Melt Dist";
-        //const char* COOL_SPEED_LABEL = "Cool Speed";
-        const char* CUT_LENGTH_LABEL = "Cut Length";
+        const char* RUN_LABEL = "RUN";
+        const char* LIFETIME_RUN_LABEL = "LIFETIME";
+        const char* RUN_COUNT_LABEL =  "RUN COUNT";
+        const char* MELT_DIST_LABEL = "MELT DIST";
+        const char* CUT_LENGTH_LABEL = "CUT LENGTH";
 
         const int RUN_LABLE_INDEX = 0;
         const int LIFETIME_RUN_LABLE_INDEX = 1;
         const int RUN_COUNT_LABLE_INDEX = 2;
         const int MELT_LABLE_INDEX = 3;
-        //const int COOL_LABLE_INDEX = 4;
         const int CUT_LABLE_INDEX = 4;
 
         String rowLabels[LABEL_COUNT];
@@ -41,7 +39,6 @@ class SetupDisplay
         int rowPrecision[LABEL_COUNT];
 
         int currentColumnIndex;
-        //int currentRowIndex;
         int currentLabelIndex;
 
         PersistantData data;

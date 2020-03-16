@@ -14,4 +14,4 @@ Stepper Driver:
     https://wiki.dfrobot.com/TB6600_Stepper_Motor_Driver_SKU__DRI0043
 
 Relay module hook up:
-    1KOhm pull
+    run with no jumper and provide 5v to JD-VCC
