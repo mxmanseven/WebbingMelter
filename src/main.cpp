@@ -82,30 +82,6 @@ DisplayProd displayProd;
 
 ButtonDirection buttonDirection;
 
-// void butLeftDown() {
-//   noInterrupts();
-//   buttonDirection = ButtonDirection::Left;
-//   interrupts();
-// }
-
-// void butRightDown() {
-//   noInterrupts();
-//   buttonDirection = ButtonDirection::Right;
-//   interrupts();
-// }
-
-// void butUpDown() {
-//   noInterrupts();
-//   buttonDirection = ButtonDirection::Up;
-//   interrupts();
-// }
-
-// void butDownDown() {
-//   noInterrupts();
-//   buttonDirection = ButtonDirection::Down;
-//   interrupts();
-// }
-
 void initSerial() {
   // Open serial communications and wait for port to open:
   Serial.begin(9600);
@@ -119,11 +95,6 @@ void initButtons() {
   pinMode(btnRightPin, INPUT_PULLDOWN);
   pinMode(btnUpPin, INPUT_PULLDOWN);
   pinMode(btnDownPin, INPUT_PULLDOWN);
-
-  // attachInterrupt(btnLeftPin, butLeftDown, RISING);
-  // attachInterrupt(btnRightPin, butRightDown, RISING);
-  // attachInterrupt(btnUpPin, butUpDown, RISING);
-  // attachInterrupt(btnDownPin, butDownDown, RISING);
 }
 
 void pullButtonStatus(ButtonDirection& buttonDirection) {
@@ -296,7 +267,8 @@ void loop()
 {
   if (topLevelMode == TopLevelMode::SetUp) {
     pullButtonStatus(buttonDirection);
-    delay(50);
+
+    if(buttonDirection != ButtonDirection::None) delay(500);
   }
 
   if(buttonDirection != ButtonDirection::None) {

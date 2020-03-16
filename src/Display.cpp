@@ -67,15 +67,11 @@ void SetupDisplay::UpdateDisplayAllRows(
 {
     //lcd.clear();  -- removing the clear increases lcd responsivness
     // make sure the whole screen is written to if clear is not used.
-    //Serial.println("Init display currentLableIndex:" + String(currentLabelIndex));
 
     for (int row = 0; row < SetupDisplay::LCD_ROW_COUNT; row++){
         lcd.setCursor(0, row);
         int labelIndex = (currentLabelIndex + row) % SetupDisplay::LABEL_COUNT;
         String toPrint = SetupDisplay::rowLabels[labelIndex];
-        // Serial.println(
-        //     "Init display rowLabels[" 
-        //     + String(labelIndex) + "]: " +  toPrint);        
 
         int lineBuffLength = 21;
         char lineBuff[lineBuffLength];
@@ -91,6 +87,9 @@ void SetupDisplay::UpdateDisplayAllRows(
 
         lcd.print(lineBuff);
     }
+
+    
+    Serial.println("");
     
     // set the cursor to the left when changing nav labels
     // set the cursor to the right when changing values (+/-)
@@ -120,11 +119,20 @@ void SetupDisplay::UpdateDisplay(
         }
         case ButtonDirection::Up:
         {
+            Serial.println("Current Lable Index init:" + String(currentLabelIndex));
+
             if(currentColumnIndex == 0) // change menu option
             {
-                currentLabelIndex = (--currentLabelIndex < 0) // wrap around to last item if we go past first itme
-                    ? LABEL_COUNT - 1
-                    : --currentLabelIndex;
+                currentLabelIndex--;
+                if(currentLabelIndex < 0) {
+                    currentLabelIndex = LABEL_COUNT - 1;
+                }
+
+                Serial.println("Current Lable Index end :" + String(currentLabelIndex));
+
+                // currentLabelIndex = (--currentLabelIndex < 0) // wrap around to last item if we go past first itme
+                //     ? LABEL_COUNT - 1
+                //     : --currentLabelIndex;
             }
             else
             {
@@ -135,7 +143,7 @@ void SetupDisplay::UpdateDisplay(
         }
         case ButtonDirection::Down:
         {
-            if(currentColumnIndex == 0)
+            if(currentColumnIndex == 0) // change menu option
             {
                 currentLabelIndex = abs(++currentLabelIndex % LABEL_COUNT);
             }
