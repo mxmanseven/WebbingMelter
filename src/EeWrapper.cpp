@@ -8,11 +8,11 @@ void EeWrapper::Get(PersistantData& data)
 { 
     EEPROM.get(EEPROM_INDEX, data);
 
-    data.lifeTimerunCount = 1;
+    //data.lifeTimerunCount = 1;
     // data.coolSpeed = 12;
-    // data.meltSpeed = 1.9;
+     //data.meltDist  = 0.75;
      //data.runCount = 12;
-    // data.cutLength = 4.125;
+     //data.cutLength = 4.125;
 }
 
 void EeWrapper::Write(PersistantData& data)

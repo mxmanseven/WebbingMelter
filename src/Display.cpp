@@ -67,7 +67,7 @@ void SetupDisplay::UpdateDisplayAllRows(
 {
     //lcd.clear();  -- removing the clear increases lcd responsivness
     // make sure the whole screen is written to if clear is not used.
-    Serial.println("Init display currentLableIndex:" + String(currentLabelIndex));
+    //Serial.println("Init display currentLableIndex:" + String(currentLabelIndex));
 
     for (int row = 0; row < SetupDisplay::LCD_ROW_COUNT; row++){
         lcd.setCursor(0, row);
@@ -96,9 +96,9 @@ void SetupDisplay::UpdateDisplayAllRows(
     // set the cursor to the right when changing values (+/-)
     int column = currentColumnIndex == 0 ? 0 : 19;
     lcd.setCursor(column, 0);
-    char buff[10];
-    snprintf(buff, 10, "%4.3f", data.cutLength);
-    Serial.println("Display: " + String(buff));
+    // char buff[10];
+    // snprintf(buff, 10, "%4.3f", data.cutLength);
+    // Serial.println("Display: " + String(buff));
 }
 
 void SetupDisplay::UpdateDisplay(

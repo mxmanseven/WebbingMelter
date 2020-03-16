@@ -1,10 +1,7 @@
 #include <Arduino.h>
-
 #include <Wire.h>
 #include <LiquidCrystal.h>
-
 #include "BasicStepperDriver.h"
-
 #include "Display.h"
 #include "DisplayProd.h"
 
@@ -16,8 +13,8 @@ const int Y_RPM = 300;
 
 const int X_SAFE_TO_HOT_COOL_PLATE_DEGREES = X_DEGREES_PER_INCH * 0.8;
 const int X_HOT_COOL_PLATE_TO_CUT_DEGREES = X_DEGREES_PER_INCH * 0.75;
-const int X_MELT_DEGREES = X_DEGREES_PER_INCH * 0.2; // knh todo - get form display
-const int X_CUT_LENGTH_DEGREES = X_DEGREES_PER_INCH * 4.9; // knh todo - get from display
+int X_MELT_DEGREES = 0; // set in setup()
+int X_CUT_LENGTH_DEGREES = 0; // set in setup()
 
 const int Y_TOPOUT_TO_MELT_DEGREES = Y_DEGREES_PER_INCH * 3.0;
 const int Y_MELT_TO_CUT_DEGREES = Y_DEGREES_PER_INCH * 1.0;
@@ -168,7 +165,7 @@ void doProductionCycle() {
 
   // zero out on top plate
   Serial.println("zero out on top plate");
-  displayProd.SetCommand(lcd, "zero out on top plat");
+  displayProd.SetCommand(lcd, "Zero out top plat   ");
   stepperY.rotate(
       Y_TOPOUT_TO_MELT_DEGREES 
       + Y_MELT_TO_CUT_DEGREES
@@ -178,18 +175,18 @@ void doProductionCycle() {
   
   // move down to cut
   Serial.println("move down to cut");
-  displayProd.SetCommand(lcd, "move down to cut    ");
+  displayProd.SetCommand(lcd, "Move down to cut    ");
   stepperY.rotate(-1 * (Y_TOPOUT_TO_MELT_DEGREES + Y_MELT_TO_CUT_DEGREES));
   delay(d);
 
   // Open Wheels
   Serial.println("Open Wheels");
-  digitalWrite(RELAY_ROLL_PIN, HIGH);
+  digitalWrite(RELAY_WHEEL_PIN, LOW);
   delay(1000);
 
   // feed for cut from safe position
   Serial.println("feed for cut from safe position");
-  displayProd.SetCommand(lcd, "feed for cut from sa");
+  displayProd.SetCommand(lcd, "Feed for cut        ");
   stepperX.rotate(X_SAFE_TO_HOT_COOL_PLATE_DEGREES + X_HOT_COOL_PLATE_TO_CUT_DEGREES + X_CUT_LENGTH_DEGREES);
   delay(d);
   // un-do for now
@@ -210,7 +207,7 @@ void doProductionCycle() {
 
   // Close Wheels
   Serial.println("Close Wheels");
-  digitalWrite(RELAY_ROLL_PIN, LOW);
+  digitalWrite(RELAY_WHEEL_PIN, HIGH);
   delay(1000);
 
   // Roll
@@ -229,19 +226,19 @@ void doProductionCycle() {
 
   // retract back to safety
   Serial.println("retract back to safety");
-  displayProd.SetCommand(lcd, "retract back to safe");
+  displayProd.SetCommand(lcd, "Retract back to safe");
   stepperX.move(-1 * (X_HOT_COOL_PLATE_TO_CUT_DEGREES));
   delay(d);
 
   // up to melt
   Serial.println("up to melt");
-  displayProd.SetCommand(lcd, "up to melt           ");
+  displayProd.SetCommand(lcd, "Move up to melt     ");
   stepperY.move(Y_MELT_TO_CUT_DEGREES);
   delay(d);
 
   // feed to melt
   Serial.println("feed to melt");
-  displayProd.SetCommand(lcd, "feed to melt         ");
+  displayProd.SetCommand(lcd, "Feed to melt        ");
   stepperX.move(X_SAFE_TO_HOT_COOL_PLATE_DEGREES);
   stepperX.setRPM(X_RPM_MELT);
   delay(d);
@@ -252,25 +249,25 @@ void doProductionCycle() {
   
   // retract to safety
   Serial.println("retract to safety");
-  displayProd.SetCommand(lcd, "retract to safety   ");
+  displayProd.SetCommand(lcd, "Retract to safety   ");
   stepperX.move(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES));
   delay(d);
 
   // down to cool
   Serial.println("down to cool");
-  displayProd.SetCommand(lcd, "down to cool        ");
+  displayProd.SetCommand(lcd, "Move down to cool   ");
   stepperY.move(-1 * (Y_MELT_TO_CUT_DEGREES + Y_CUT_TO_COOL_DEGREES));
   delay(d);
 
   // feed to cool
   Serial.println("feed to cool");
-  displayProd.SetCommand(lcd, "feed to cool        ");
+  displayProd.SetCommand(lcd, "Feed to cool        ");
   stepperX.move(X_SAFE_TO_HOT_COOL_PLATE_DEGREES);
   delay(d);
 
   // retract to safety
   Serial.println("retract to safety");
-  displayProd.SetCommand(lcd, "retract to safety   ");
+  displayProd.SetCommand(lcd, "Retract to safety   ");
   stepperX.move(-1 * (X_SAFE_TO_HOT_COOL_PLATE_DEGREES));
    delay(d);
 }
@@ -307,6 +304,9 @@ void loop()
 
   if (topLevelMode == TopLevelMode::Production)
   {    
+    X_MELT_DEGREES = X_DEGREES_PER_INCH * setupDisplay.data.meltDist;
+    X_CUT_LENGTH_DEGREES = X_DEGREES_PER_INCH * setupDisplay.data.cutLength;
+  
     displayProd.expectedRunCount = setupDisplay.data.runCount;
     displayProd.currentRunCount = 0;
     for(int i = 0; i < setupDisplay.data.runCount; i++) {
@@ -318,5 +318,11 @@ void loop()
     }
 
     topLevelMode = TopLevelMode::SetUp;
+    initRelay();
+
+    setupDisplay.rowValues[setupDisplay.LIFETIME_RUN_LABLE_INDEX] 
+      = String(setupDisplay.data.lifeTimerunCount);
+    bool exitSetUpMode = false;
+    setupDisplay.UpdateDisplayAllRows(lcd, exitSetUpMode);
   }
 }
