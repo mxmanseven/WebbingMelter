@@ -73,9 +73,9 @@ void SetupDisplay::UpdateDisplayAllRows(
         lcd.setCursor(0, row);
         int labelIndex = (currentLabelIndex + row) % SetupDisplay::LABEL_COUNT;
         String toPrint = SetupDisplay::rowLabels[labelIndex];
-        Serial.println(
-            "Init display rowLabels[" 
-            + String(labelIndex) + "]: " +  toPrint);        
+        // Serial.println(
+        //     "Init display rowLabels[" 
+        //     + String(labelIndex) + "]: " +  toPrint);        
 
         int lineBuffLength = 21;
         char lineBuff[lineBuffLength];

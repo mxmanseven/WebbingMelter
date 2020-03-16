@@ -82,29 +82,29 @@ DisplayProd displayProd;
 
 ButtonDirection buttonDirection;
 
-void butLeftDown() {
-  noInterrupts();
-  buttonDirection = ButtonDirection::Left;
-  interrupts();
-}
+// void butLeftDown() {
+//   noInterrupts();
+//   buttonDirection = ButtonDirection::Left;
+//   interrupts();
+// }
 
-void butRightDown() {
-  noInterrupts();
-  buttonDirection = ButtonDirection::Right;
-  interrupts();
-}
+// void butRightDown() {
+//   noInterrupts();
+//   buttonDirection = ButtonDirection::Right;
+//   interrupts();
+// }
 
-void butUpDown() {
-  noInterrupts();
-  buttonDirection = ButtonDirection::Up;
-  interrupts();
-}
+// void butUpDown() {
+//   noInterrupts();
+//   buttonDirection = ButtonDirection::Up;
+//   interrupts();
+// }
 
-void butDownDown() {
-  noInterrupts();
-  buttonDirection = ButtonDirection::Down;
-  interrupts();
-}
+// void butDownDown() {
+//   noInterrupts();
+//   buttonDirection = ButtonDirection::Down;
+//   interrupts();
+// }
 
 void initSerial() {
   // Open serial communications and wait for port to open:
@@ -120,10 +120,30 @@ void initButtons() {
   pinMode(btnUpPin, INPUT_PULLDOWN);
   pinMode(btnDownPin, INPUT_PULLDOWN);
 
-  attachInterrupt(btnLeftPin, butLeftDown, RISING);
-  attachInterrupt(btnRightPin, butRightDown, RISING);
-  attachInterrupt(btnUpPin, butUpDown, RISING);
-  attachInterrupt(btnDownPin, butDownDown, RISING);
+  // attachInterrupt(btnLeftPin, butLeftDown, RISING);
+  // attachInterrupt(btnRightPin, butRightDown, RISING);
+  // attachInterrupt(btnUpPin, butUpDown, RISING);
+  // attachInterrupt(btnDownPin, butDownDown, RISING);
+}
+
+void pullButtonStatus(ButtonDirection& buttonDirection) {
+  if (digitalRead(btnLeftPin) == HIGH) {
+    buttonDirection = ButtonDirection::Left;
+    return;
+  }
+  if (digitalRead(btnRightPin) == HIGH) {
+    buttonDirection = ButtonDirection::Right;
+    return;
+  }
+  if (digitalRead(btnUpPin) == HIGH) {
+    buttonDirection = ButtonDirection::Up;
+    return;
+  }
+  if (digitalRead(btnDownPin) == HIGH) {
+    buttonDirection = ButtonDirection::Down;
+    return;
+  }
+  buttonDirection == ButtonDirection::None; 
 }
 
 void initRelay() {
@@ -274,6 +294,11 @@ void doProductionCycle() {
 
 void loop() 
 {
+  if (topLevelMode == TopLevelMode::SetUp) {
+    pullButtonStatus(buttonDirection);
+    delay(50);
+  }
+
   if(buttonDirection != ButtonDirection::None) {
     switch (topLevelMode) 
     {
