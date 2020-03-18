@@ -23,8 +23,8 @@ class SetupDisplay
         static const int LABEL_COUNT = 5;
 
         const char* RUN_LABEL = "RUN";
-        const char* LIFETIME_RUN_LABEL = "LIFETIME";
-        const char* RUN_COUNT_LABEL =  "RUN COUNT";
+        const char* LIFETIME_RUN_LABEL = "RUN-TOTAL";
+        const char* RUN_COUNT_LABEL =  "CUT QTY";
         const char* MELT_DIST_LABEL = "MELT DIST";
         const char* CUT_LENGTH_LABEL = "CUT LENGTH";
 

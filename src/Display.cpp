@@ -44,6 +44,8 @@ SetupDisplay::SetupDisplay() {
     currentColumnIndex = 0;
     currentLabelIndex = 0;
 
+    //eeWrapper.Test();
+
     eeWrapper.Get(data);
     SetupDisplay::rowValues[0] = "GO";
     SetupDisplay::rowValues[1] = String(data.lifeTimerunCount);
@@ -77,7 +79,7 @@ void SetupDisplay::UpdateDisplayAllRows(
         String label = SetupDisplay::rowLabels[labelIndex];
         String value = SetupDisplay::rowValues[labelIndex];
 
-        snprintf(lineBuff, lineBuffLength, "%-10s %9s",
+        snprintf(lineBuff, lineBuffLength, "%-14s %5s",
             SetupDisplay::rowLabels[labelIndex].c_str(),
             SetupDisplay::rowValues[labelIndex].c_str());
 
@@ -180,7 +182,7 @@ void SetupDisplay::ChangeRowValue(
             float changeAmount = 0.01001;
             if(direction == ButtonDirection::Down) changeAmount = -0.0099;
 
-            if(labelIndex == RUN_COUNT_LABLE_INDEX) changeAmount = changeAmount * 100;
+            if(labelIndex == RUN_COUNT_LABLE_INDEX) changeAmount = changeAmount * 1000;
             rowValueF += changeAmount;
             rowValueStr = FloatFormat(rowValueF, 2);
             SetupDisplay::rowValues[labelIndex] = rowValueStr;
