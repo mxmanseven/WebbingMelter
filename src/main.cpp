@@ -155,20 +155,21 @@ void setup() {
 void doProductionCycle() {
   int d = 1;
 
+
   // zero out on top plate
   Serial.println("zero out on top plate");
   displayProd.SetCommand(lcd, "ZERO OUT TOP PLATE   ");
-  stepperY.rotate(
-      Y_TOPOUT_TO_MELT_DEGREES 
+  stepperY.rotate(-1 * 
+      (Y_TOPOUT_TO_MELT_DEGREES 
       + Y_MELT_TO_CUT_DEGREES
       + Y_CUT_TO_COOL_DEGREES 
-      + Y_TOPOUT_EXTRA_DEGREES);
+      + Y_TOPOUT_EXTRA_DEGREES));
   delay(d);
   
   // move down to cut
   Serial.println("move down to cut");
   displayProd.SetCommand(lcd, "MOVE DOWN TO CUT    ");
-  stepperY.rotate(-1 * (Y_TOPOUT_TO_MELT_DEGREES + Y_MELT_TO_CUT_DEGREES));
+  stepperY.rotate(Y_TOPOUT_TO_MELT_DEGREES + Y_MELT_TO_CUT_DEGREES);
   delay(d);
 
   // Open Wheels
@@ -223,7 +224,7 @@ void doProductionCycle() {
   // up to melt
   Serial.println("up to melt");
   displayProd.SetCommand(lcd, "MOVE UP TO MELT     ");
-  stepperY.rotate(Y_MELT_TO_CUT_DEGREES);
+  stepperY.rotate(-1 * (Y_MELT_TO_CUT_DEGREES));
   //delay(5000);
 
   // feed to melt
@@ -249,7 +250,7 @@ void doProductionCycle() {
   // down to cool
   Serial.println("down to cool");
   displayProd.SetCommand(lcd, "MOVE DOWN TO COOL   ");
-  stepperY.rotate(-1 * (Y_MELT_TO_CUT_DEGREES + Y_CUT_TO_COOL_DEGREES));
+  stepperY.rotate(Y_MELT_TO_CUT_DEGREES + Y_CUT_TO_COOL_DEGREES);
   //delay(5000);
 
   // feed to cool
