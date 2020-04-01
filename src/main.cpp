@@ -13,14 +13,14 @@ const float X_RPM_COOL = 5;
 const int Y_RPM = 300;
 
 const float X_SAFE_TO_HOT_COOL_PLATE_DEGREES = X_DEGREES_PER_INCH * 0.5;
-const float X_HOT_COOL_PLATE_TO_CUT_DEGREES = X_DEGREES_PER_INCH * 0.5;
-const float X_COOL_PLATE_EXTRA_DEGREES = 0.5; // approx degrees of rotation
+const float X_HOT_COOL_PLATE_TO_CUT_DEGREES = X_DEGREES_PER_INCH * 1.335;
+const float X_COOL_PLATE_EXTRA_DEGREES = 12; // approx degrees of rotation
 float X_MELT_DEGREES = 0; // set in setup()
 float X_CUT_LENGTH_DEGREES = 0; // set in setup()
 
 const int Y_TOPOUT_TO_MELT_DEGREES = Y_DEGREES_PER_INCH * 3.0;
-const int Y_MELT_TO_CUT_DEGREES = Y_DEGREES_PER_INCH * 1.0;
-const int Y_CUT_TO_COOL_DEGREES = Y_DEGREES_PER_INCH * 1.0;
+const int Y_MELT_TO_CUT_DEGREES = Y_DEGREES_PER_INCH * 1.5;
+const int Y_CUT_TO_COOL_DEGREES = Y_DEGREES_PER_INCH * 1.47;
 const int Y_TOPOUT_EXTRA_DEGREES = Y_DEGREES_PER_INCH * 0.1;
 
 const int CUT_RELAY_DURATION_MS = 1500;
@@ -160,16 +160,15 @@ void doProductionCycle() {
   Serial.println("zero out on top plate");
   displayProd.SetCommand(lcd, "ZERO OUT TOP PLATE   ");
   stepperY.rotate(-1 * 
-      (Y_TOPOUT_TO_MELT_DEGREES 
+      (Y_CUT_TO_COOL_DEGREES 
       + Y_MELT_TO_CUT_DEGREES
-      + Y_CUT_TO_COOL_DEGREES 
       + Y_TOPOUT_EXTRA_DEGREES));
   delay(d);
   
   // move down to cut
   Serial.println("move down to cut");
   displayProd.SetCommand(lcd, "MOVE DOWN TO CUT    ");
-  stepperY.rotate(Y_TOPOUT_TO_MELT_DEGREES + Y_MELT_TO_CUT_DEGREES);
+  stepperY.rotate(Y_MELT_TO_CUT_DEGREES);
   delay(d);
 
   // Open Wheels
